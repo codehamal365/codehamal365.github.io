@@ -10,6 +10,6 @@ gem "jekyll-feed"
 gem "jekyll-gist"
 gem "jekyll-include-cache"
 
-group :test do
-  gem "html-proofer", "~> 5.0"
-end
+# group :test do
+#   gem "html-proofer", "~> 5.0"
+# end
