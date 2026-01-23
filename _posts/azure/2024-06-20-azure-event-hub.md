@@ -230,7 +230,99 @@ tags:
       loop = asyncio.get_event_loop()
       # Run the main method.
       loop.run_until_complete(main())
-  ```
+```
+
+## What is Azure Event Hub
+
+Azure Event Hubs is a big data streaming platform and event ingestion service that can receive and process millions of events per second. It can transform and store data using real-time analytics providers or batching/storage adapters.
+
+## Key Concepts
+
+- **Events**: Data sent to Event Hub.
+- **Partitions**: Data streams within a hub for parallel processing.
+- **Consumer Groups**: Allow multiple consumers to read the stream independently.
+- **Throughput Units (TU)**: Units that define ingress and egress capacity.
+
+## Advanced Function Examples
+
+### Handling Multiple Events
+
+Modify the function to process batches:
+
+```python
+def main(events: func.EventHubEvent):
+   for event in events:
+       logging.info('Event: %s', event.get_body().decode('utf-8'))
+```
+
+Set `cardinality: "many"` in function.json.
+
+### Error Handling
+
+```python
+def main(event: func.EventHubEvent):
+   try:
+       data = json.loads(event.get_body().decode('utf-8'))
+       # Process data
+   except Exception as e:
+       logging.error('Error processing event: %s', str(e))
+```
+
+## Event Hub Producer Example with Batching
+
+```python
+from azure.eventhub import EventHubProducerClient, EventData
+
+client = EventHubProducerClient.from_connection_string(conn_str, eventhub_name)
+
+with client:
+   event_data_batch = client.create_batch()
+   for i in range(10):
+       event_data_batch.add(EventData(f'Event {i}'))
+   client.send_batch(event_data_batch)
+```
+
+## Consumer Example
+
+```python
+from azure.eventhub import EventHubConsumerClient
+
+def on_event(partition_context, event):
+   print(event.body_as_str())
+   partition_context.update_checkpoint(event)
+
+client = EventHubConsumerClient.from_connection_string(
+   conn_str, consumer_group="$Default", eventhub_name=eventhub_name
+)
+
+with client:
+   client.receive(on_event=on_event, starting_position="-1")
+```
+
+## Scaling and Performance
+
+- **Auto-Inflate**: Automatically increase TU as needed.
+- **Partitioning**: Distribute load across partitions.
+- **Checkpointing**: Track progress to resume from last point.
+
+## Best Practices
+
+- **Batch Events**: Send events in batches for efficiency.
+- **Monitor Metrics**: Use Azure Monitor for throughput, latency.
+- **Secure Access**: Use Shared Access Signatures (SAS).
+- **Handle Failures**: Implement retry logic in functions.
+
+## Troubleshooting
+
+- **Connection Issues**: Verify connection strings and network access.
+- **Event Loss**: Ensure proper checkpointing.
+- **Throttling**: Monitor TU usage and scale accordingly.
+
+## Additional Resources
+
+- [Azure Event Hubs Documentation](https://docs.microsoft.com/en-us/azure/event-hubs/)
+- [Azure Functions Triggers](https://docs.microsoft.com/en-us/azure/azure-functions/functions-triggers-bindings)
+- [Event Hubs Samples](https://github.com/Azure/azure-event-hubs-python)
 
   
 

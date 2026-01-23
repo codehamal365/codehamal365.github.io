@@ -7,9 +7,13 @@ tags:
 ---
 
 
-# OpenApi tools
-有时候项目在需求对接或是澄清阶段，客户或是技术经理会把需求的api接口通过yaml定义出来，也就是我们所说的`swagger-api`文件。这样开发人员能更清楚的了解到接口的入参和出参，方便开发。
-这时候，你可能觉得自己根据yaml手写model和api定义接口就可以了，我以前也是这么做的，但是看到团队的代码，发现有一种更简洁的方法,那就是根据`openapi-generator`自动生成java代码，这样就方便多了，简直不要太爽了。
+# OpenApi 代码生成工具
+
+在现代 API 开发中，OpenAPI 规范（原 Swagger）允许以 YAML 或 JSON 格式定义 API 接口。这有助于前后端分离、文档生成和自动化测试。
+
+当客户或团队提供 OpenAPI YAML 文件时，手动编写模型和接口代码繁琐且易错。OpenAPI Generator 工具可以自动从规范生成客户端、服务端代码，支持多种语言和框架，大大提升开发效率。
+
+本文聚焦 Maven 插件使用，版本更新至 v7.0.0（当前最新稳定版）。
 
 # 官方资料
 官方参考资料可以参考如下。
@@ -18,7 +22,7 @@ tags:
 本篇所讲的是基于`openapi-generator`的maven插件，参考地址如下
 > https://github.com/OpenAPITools/openapi-generator/tree/master/modules/openapi-generator-maven-plugin
 
-截止当前使用版本为：`v5.4.0`
+截止当前使用版本为：`v7.0.0`
 
 # 具体步骤
 
@@ -31,7 +35,7 @@ tags:
         <plugin>
             <groupId>org.openapitools</groupId>
             <artifactId>openapi-generator-maven-plugin</artifactId>
-            <version>5.4.0</version>
+            <version>7.0.0</version>
             <executions>
                 <execution>
                     <id>generatePetEtc</id>
@@ -104,4 +108,63 @@ tags:
 ```
 
 ## 执行 mvn clean package
-执行成功后,切换到 /target/generated-sources/openapi/src/main/java/org/example   会看到生成的model和api接口。odel和api接口。
+执行成功后,切换到 /target/generated-sources/openapi/src/main/java/org/example   会看到生成的model和api接口。
+
+## 其他生成器选项
+- `java`：生成 JAX-RS 客户端
+- `spring`：Spring Boot 服务端
+- `kotlin-spring`：Kotlin Spring 服务端
+- `typescript-angular`：Angular TypeScript 客户端
+- `python`：Python 客户端
+
+## 高级配置选项
+```xml
+<configOptions>
+    <skipDefaultInterface>true</skipDefaultInterface>
+    <interfaceOnly>true</interfaceOnly>
+    <useTags>true</useTags>
+    <dateLibrary>java8</dateLibrary>
+    <java8>true</java8>
+</configOptions>
+```
+
+## 示例 YAML 文件
+```yaml
+openapi: 3.0.0
+info:
+  title: Sample API
+  version: 1.0.0
+paths:
+  /users:
+    get:
+      summary: Get users
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+```
+
+## CLI 使用
+除了 Maven 插件，还可使用 CLI：
+```bash
+openapi-generator-cli generate -i api.yaml -g spring -o ./generated
+```
+
+## 故障排除
+- **版本兼容**：确保 OpenAPI 版本匹配生成器版本。
+- **依赖冲突**：检查 Jackson 和其他库版本。
+- **自定义模板**：可使用自定义模板生成特定代码。

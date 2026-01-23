@@ -297,9 +297,209 @@ public class SpringRetryIntegrationTest {
 
 As we can see from the test logs, we have properly configured the *RetryTemplate* and the *RetryListener*
 
+## Advanced Retry Patterns
+
+### Exponential Backoff
+
+For more sophisticated retry strategies, use ExponentialBackOffPolicy:
+
+```java
+@Configuration
+public class AppConfig {
+    @Bean
+    public RetryTemplate retryTemplate() {
+        RetryTemplate retryTemplate = new RetryTemplate();
+
+        ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+        backOffPolicy.setInitialInterval(1000L); // 1 second
+        backOffPolicy.setMultiplier(2.0); // Double the delay each time
+        backOffPolicy.setMaxInterval(30000L); // Max 30 seconds
+        retryTemplate.setBackOffPolicy(backOffPolicy);
+
+        SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
+        retryPolicy.setMaxAttempts(5);
+        retryTemplate.setRetryPolicy(retryPolicy);
+
+        return retryTemplate;
+    }
+}
+```
+
+### Conditional Retries
+
+Use custom retry policies for conditional retries:
+
+```java
+public class CustomRetryPolicy extends SimpleRetryPolicy {
+    @Override
+    public boolean canRetry(RetryContext context) {
+        Throwable lastException = context.getLastThrowable();
+        if (lastException instanceof SQLException) {
+            // Only retry for connection errors
+            return lastException.getMessage().contains("connection");
+        }
+        return super.canRetry(context);
+    }
+}
+```
+
+### State Management
+
+RetryContext allows storing state between retry attempts:
+
+```java
+retryTemplate.execute(new RetryCallback<Void, Exception>() {
+    @Override
+    public Void doWithRetry(RetryContext context) throws Exception {
+        Integer attemptCount = (Integer) context.getAttribute("attemptCount");
+        if (attemptCount == null) {
+            attemptCount = 0;
+        }
+        attemptCount++;
+        context.setAttribute("attemptCount", attemptCount);
+
+        logger.info("Attempt #" + attemptCount);
+        // Business logic here
+        return null;
+    }
+});
+```
+
+### Circuit Breaker Integration
+
+Spring Retry can be combined with circuit breakers:
+
+```java
+@Bean
+public RetryTemplate circuitBreakerRetryTemplate() {
+    RetryTemplate template = new RetryTemplate();
+
+    CircuitBreakerRetryPolicy policy = new CircuitBreakerRetryPolicy();
+    policy.setRetryPolicy(new SimpleRetryPolicy(3));
+    policy.setOpenTimeout(5000); // 5 seconds
+    policy.setResetTimeout(20000); // 20 seconds
+
+    template.setRetryPolicy(policy);
+    return template;
+}
+```
+
+### Async Retries
+
+For non-blocking retries, use @Async with @Retryable:
+
+```java
+@Service
+public class AsyncRetryService {
+
+    @Async
+    @Retryable(value = Exception.class, maxAttempts = 3)
+    public CompletableFuture<String> asyncRetryOperation() {
+        // Potentially failing operation
+        return CompletableFuture.completedFuture("result");
+    }
+}
+```
+
+### Exception Classification
+
+Use ExceptionClassifierRetryPolicy for different retry strategies based on exception types:
+
+```java
+@Bean
+public RetryTemplate exceptionClassifierRetryTemplate() {
+    RetryTemplate template = new RetryTemplate();
+
+    ExceptionClassifierRetryPolicy policy = new ExceptionClassifierRetryPolicy();
+
+    Map<Class<? extends Throwable>, RetryPolicy> policyMap = new HashMap<>();
+    policyMap.put(SQLException.class, new SimpleRetryPolicy(5));
+    policyMap.put(IOException.class, new SimpleRetryPolicy(2));
+    policyMap.put(RuntimeException.class, new NeverRetryPolicy());
+
+    policy.setPolicyMap(policyMap);
+    template.setRetryPolicy(policy);
+
+    return template;
+}
+```
+
+### Metrics and Monitoring
+
+Add metrics to track retry behavior:
+
+```java
+@Component
+public class RetryMetricsListener extends RetryListenerSupport {
+
+    @Override
+    public <T, E extends Throwable> void onError(RetryContext context,
+            RetryCallback<T, E> callback, Throwable throwable) {
+        // Increment metrics
+        metrics.incrementRetryCount(throwable.getClass().getSimpleName());
+    }
+
+    @Override
+    public <T, E extends Throwable> void close(RetryContext context,
+            RetryCallback<T, E> callback, Throwable throwable) {
+        if (throwable != null) {
+            // Record failed retry
+            metrics.recordFailedRetry(context.getRetryCount());
+        }
+    }
+}
+```
+
+### Integration with Spring Boot
+
+Spring Boot provides auto-configuration for Spring Retry. Just add the dependency and @EnableRetry:
+
+```xml
+<dependency>
+    <groupId>org.springframework.retry</groupId>
+    <artifactId>spring-retry</artifactId>
+</dependency>
+```
+
+```java
+@SpringBootApplication
+@EnableRetry
+public class Application {
+    // Spring Boot will auto-configure RetryTemplate
+}
+```
+
+### Best Practices
+
+1. **Use appropriate backoff strategies**: Exponential backoff for external services, fixed for internal operations.
+
+2. **Set reasonable max attempts**: Too many retries can worsen performance issues.
+
+3. **Handle exceptions properly**: Not all exceptions should trigger retries (e.g., IllegalArgumentException).
+
+4. **Use recovery methods**: Always provide @Recover methods for graceful degradation.
+
+5. **Monitor retry metrics**: Track retry rates and success/failure patterns.
+
+6. **Consider circuit breakers**: For services that might be down for extended periods.
+
+7. **Test retry logic**: Ensure retry mechanisms work as expected.
+
+### Common Pitfalls
+
+1. **Infinite loops**: Ensure retry policies have proper termination conditions.
+
+2. **Resource leaks**: Retries can consume resources; ensure proper cleanup.
+
+3. **State corruption**: Be careful with state changes during retries.
+
+4. **Performance impact**: Excessive retries can degrade system performance.
+
+5. **Silent failures**: @Recover methods should log failures appropriately.
+
 ## **Conclusion**
 
-In this article, we saw how to use Spring Retry using annotations, the *RetryTemplate* and callbacks listeners.
+In this article, we saw how to use Spring Retry using annotations, the *RetryTemplate*, callbacks listeners, and advanced patterns like exponential backoff, conditional retries, and circuit breaker integration.
 
 The source code for the examples is available [over on GitHub](https://github.com/eugenp/tutorials/tree/master/spring-scheduling).
 

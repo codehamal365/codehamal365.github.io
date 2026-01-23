@@ -86,6 +86,230 @@ java -Dthin.dryrun=true -Dthin.root=. -jar awesome-app.jar
 
 如果服务器由于安全限制不允许从外网下载文件，那么可以在本地预热，然后把`awesome-app.jar`和`repository`目录上传到服务器。只要依赖项没有变化，后续改动只需要上传`awesome-app.jar`即可。
 
+## 其他瘦身方案
+
+### Spring Boot Layers (推荐)
+
+Spring Boot 2.3+ 引入了分层JAR支持，这是官方推荐的瘦身方案：
+
+```xml
+<plugin>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+    <configuration>
+        <layers>
+            <enabled>true</enabled>
+        </layers>
+    </configuration>
+</plugin>
+```
+
+分层后的JAR包含：
+- `dependencies`：第三方依赖
+- `spring-boot-loader`：Spring Boot加载器
+- `snapshot-dependencies`：快照依赖
+- `resources`：静态资源
+- `application`：应用代码
+
+Docker多阶段构建示例：
+
+```dockerfile
+# 构建阶段
+FROM openjdk:11 as builder
+WORKDIR /app
+COPY . .
+RUN ./mvnw package
+
+# 运行阶段 - 只复制应用层
+FROM openjdk:11-jre-slim
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
+RUN java -Djarmode=layertools -jar app.jar extract
+
+# 利用分层缓存
+COPY --from=builder /app/target/dependencies/ ./
+COPY --from=builder /app/target/spring-boot-loader/ ./
+COPY --from=builder /app/target/snapshot-dependencies/ ./
+COPY --from=builder /app/target/resources/ ./
+COPY --from=builder /app/target/application/ ./
+
+ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
+```
+
+### 自定义瘦身插件
+
+创建自定义Maven插件进行更精细的控制：
+
+```java
+@Mojo(name = "slim-package")
+public class SlimPackageMojo extends AbstractMojo {
+
+    @Parameter(defaultValue = "${project}")
+    private MavenProject project;
+
+    @Parameter(defaultValue = "${project.build.directory}")
+    private File outputDirectory;
+
+    public void execute() throws MojoExecutionException {
+        // 分析依赖，排除不必要的JAR
+        // 创建精简版JAR
+        // 生成依赖清单
+    }
+}
+```
+
+### 依赖排除和优化
+
+在pom.xml中排除不必要的依赖：
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <exclusions>
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<!-- 使用更轻量的替代品 -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-jetty</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-log4j2</artifactId>
+</dependency>
+```
+
+### Gradle支持
+
+Gradle的bootJar任务也支持分层：
+
+```gradle
+bootJar {
+    layered {
+        enabled = true
+    }
+}
+
+// 自定义分层
+bootJar {
+    layered {
+        enabled = true
+        includeLayerTools = true
+    }
+    requiresUnpack = ['**/BOOT-INF/lib/my-special.jar']
+}
+```
+
+### 云原生优化
+
+对于云部署的进一步优化：
+
+1. **使用Jib或Buildpacks**：Google Jib或Cloud Native Buildpacks可以创建优化的Docker镜像。
+
+2. **依赖分离**：将应用和依赖分离部署。
+
+3. **使用Alpine Linux**：使用更小的基础镜像。
+
+4. **JVM调优**：使用更小的JVM镜像和合适的GC算法。
+
+### 高级配置
+
+Thin Launcher的高级配置：
+
+```xml
+<plugin>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot.experimental</groupId>
+            <artifactId>spring-boot-thin-layout</artifactId>
+            <version>1.0.27.RELEASE</version>
+        </dependency>
+    </dependencies>
+    <configuration>
+        <thin>
+            <archive>
+                <classifier>thin</classifier>
+            </archive>
+            <includes>
+                <include>com.example:my-library:1.0</include>
+            </includes>
+            <excludes>
+                <exclude>org.springframework.boot:spring-boot-starter-test</exclude>
+            </excludes>
+        </thin>
+    </configuration>
+</plugin>
+```
+
+### 运行时配置
+
+Thin Launcher运行时选项：
+
+```bash
+# 指定仓库位置
+java -Dthin.root=/opt/thin-repo -jar app.jar
+
+# 离线模式
+java -Dthin.offline=true -jar app.jar
+
+# 强制刷新依赖
+java -Dthin.force=true -jar app.jar
+
+# 自定义Maven设置
+java -Dthin.settings=/path/to/settings.xml -jar app.jar
+```
+
+### 故障排除
+
+常见问题及解决方案：
+
+1. **依赖下载失败**：检查网络连接和Maven配置。
+
+2. **版本冲突**：使用`thin.force=true`强制重新下载。
+
+3. **权限问题**：确保有写入仓库目录的权限。
+
+4. **内存不足**：增加JVM内存：`java -Xmx2g -jar app.jar`
+
+5. **代理设置**：配置Maven代理或使用`thin.settings`指定设置文件。
+
+### 性能对比
+
+| 方法 | JAR大小 | 首次启动 | 后续启动 | 适用场景 |
+|------|---------|----------|----------|----------|
+| 传统fat JAR | 50-200MB | 快 | 快 | 单体应用 |
+| Thin Launcher | 1-5MB | 慢 | 快 | CI/CD频繁部署 |
+| Layers + Docker | 优化镜像 | 中等 | 快 | 容器化部署 |
+| 自定义瘦身 | 最小化 | 慢 | 快 | 特殊需求 |
+
+### 安全考虑
+
+1. **依赖验证**：验证下载依赖的完整性。
+
+2. **私有仓库**：使用私有Maven仓库避免外部依赖。
+
+3. **签名验证**：验证JAR文件的数字签名。
+
+4. **最小权限**：运行时使用最小权限原则。
+
 ### 小结
 
-利用`spring-boot-thin-launcher`可以给Spring Boot应用瘦身。其原理是记录app依赖的jar包，在首次运行时先下载依赖项并缓存到本地。
+Spring Boot提供了多种瘦身方案：
+- **Thin Launcher**：适合传统部署，依赖运行时下载
+- **Layers**：官方推荐，适合Docker和云原生
+- **自定义优化**：最大化瘦身，但复杂度较高
+
+选择方案时需要考虑部署环境、CI/CD流程和运维需求。

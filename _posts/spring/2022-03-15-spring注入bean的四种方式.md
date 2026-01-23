@@ -358,4 +358,257 @@ public class SpringBootLearningApplication {
         }
     }
 }
+
+## 高级注入技巧
+
+### 条件化Bean注册
+
+使用@Conditional注解根据条件注册Bean：
+
+```java
+@Configuration
+public class ConditionalConfig {
+
+    @Bean
+    @ConditionalOnProperty(name = "feature.database.enabled", havingValue = "true")
+    public DatabaseService databaseService() {
+        return new DatabaseService();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(DatabaseService.class)
+    public MockDatabaseService mockDatabaseService() {
+        return new MockDatabaseService();
+    }
+}
+```
+
+### Bean作用域
+
+Spring支持多种作用域：
+
+```java
+@Component
+@Scope("prototype")  // 每次注入都创建新实例
+public class PrototypeBean {
+}
+
+@Component
+@Scope("singleton")  // 默认，单例
+public class SingletonBean {
+}
+
+@Component
+@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
+public class RequestScopedBean {
+}
+```
+
+### 限定符和主Bean
+
+当有多个相同类型的Bean时使用@Qualifier：
+
+```java
+@Configuration
+public class QualifierConfig {
+
+    @Bean
+    @Qualifier("primaryDataSource")
+    @Primary  // 标记为主Bean，当没有指定限定符时使用
+    public DataSource primaryDataSource() {
+        return new HikariDataSource();
+    }
+
+    @Bean
+    @Qualifier("secondaryDataSource")
+    public DataSource secondaryDataSource() {
+        return new BasicDataSource();
+    }
+}
+
+@Service
+public class DataService {
+
+    @Autowired
+    @Qualifier("primaryDataSource")
+    private DataSource dataSource;
+}
+```
+
+### Profile特定Bean
+
+使用@Profile为不同环境注册Bean：
+
+```java
+@Configuration
+public class ProfileConfig {
+
+    @Bean
+    @Profile("dev")
+    public DataSource devDataSource() {
+        return new EmbeddedDatabaseBuilder()
+            .setType(EmbeddedDatabaseType.H2)
+            .build();
+    }
+
+    @Bean
+    @Profile("prod")
+    public DataSource prodDataSource() {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://prod-db:3306/app");
+        return new HikariDataSource(config);
+    }
+}
+```
+
+### Bean生命周期回调
+
+实现生命周期接口：
+
+```java
+@Component
+public class LifecycleBean implements InitializingBean, DisposableBean {
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        // 初始化逻辑
+        System.out.println("Bean initialized");
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        // 销毁逻辑
+        System.out.println("Bean destroyed");
+    }
+}
+```
+
+或者使用@PostConstruct和@PreDestroy：
+
+```java
+@Component
+public class LifecycleBean {
+
+    @PostConstruct
+    public void init() {
+        System.out.println("Bean initialized");
+    }
+
+    @PreDestroy
+    public void cleanup() {
+        System.out.println("Bean destroyed");
+    }
+}
+```
+
+### 自定义ImportSelector
+
+更复杂的条件导入：
+
+```java
+public class ConditionalImportSelector implements ImportSelector {
+
+    @Override
+    public String[] selectImports(AnnotationMetadata importingClassMetadata) {
+        List<String> imports = new ArrayList<>();
+
+        // 检查是否存在特定注解
+        if (importingClassMetadata.hasAnnotation("com.example.EnableFeature")) {
+            imports.add("com.example.FeatureService");
+        }
+
+        // 检查类路径
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            imports.add("com.example.MySqlConfig");
+        } catch (ClassNotFoundException e) {
+            imports.add("com.example.H2Config");
+        }
+
+        return imports.toArray(new String[0]);
+    }
+}
+```
+
+### FactoryBean的高级用法
+
+FactoryBean可以创建复杂对象：
+
+```java
+@Component
+public class ConnectionFactoryBean implements FactoryBean<Connection> {
+
+    @Value("${db.url}")
+    private String url;
+
+    @Value("${db.username}")
+    private String username;
+
+    @Value("${db.password}")
+    private String password;
+
+    @Override
+    public Connection getObject() throws Exception {
+        // 创建连接池或复杂连接逻辑
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(url);
+        config.setUsername(username);
+        config.setPassword(password);
+
+        HikariDataSource dataSource = new HikariDataSource(config);
+        return dataSource.getConnection();
+    }
+
+    @Override
+    public Class<?> getObjectType() {
+        return Connection.class;
+    }
+
+    @Override
+    public boolean isSingleton() {
+        return false; // 每次获取新连接
+    }
+}
+```
+
+### 最佳实践
+
+1. **优先使用@ComponentScan**：对于自己编写的类，使用@Component系列注解。
+
+2. **使用@Configuration/@Bean**：对于第三方库或需要复杂初始化逻辑的Bean。
+
+3. **@Import用于模块化**：将相关Bean分组导入。
+
+4. **FactoryBean用于复杂对象**：当Bean创建需要复杂逻辑时。
+
+5. **使用@Conditional**：实现条件化配置。
+
+6. **合理使用作用域**：避免不必要的prototype Bean。
+
+7. **Bean命名规范**：使用有意义的Bean名称。
+
+8. **避免循环依赖**：通过重构或@Lazy解决。
+
+### 注入方式比较
+
+| 方式 | 适用场景 | 优点 | 缺点 |
+|------|----------|------|------|
+| @ComponentScan | 自有代码 | 简单，约定大于配置 | 只能扫描指定包 |
+| @Configuration/@Bean | 第三方库 | 灵活控制Bean创建 | 代码量较大 |
+| @Import | 模块化配置 | 解耦，条件导入 | 相对复杂 |
+| FactoryBean | 复杂对象 | 延迟初始化，代理 | 需要实现接口 |
+
+### Spring Boot自动配置
+
+Spring Boot大量使用这些机制：
+
+```java
+@Configuration
+@ConditionalOnClass(DataSource.class)
+@ConditionalOnProperty(name = "spring.datasource.url")
+@EnableConfigurationProperties(DataSourceProperties.class)
+public class DataSourceAutoConfiguration {
+    // 自动配置DataSource
+}
+```
 ~~~

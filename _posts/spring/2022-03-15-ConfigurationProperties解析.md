@@ -351,7 +351,255 @@ private List<Validator> getValidators(Bindable<?> target) {
   }
   ```
 
-  ### 思考
+### 高级用法
 
-  - 以上实例中，实体类对应的属性配置在application.yaml,那能不能从其他自定义的yaml中配置或者从配置中心获取呢？
-  - 配置的参数如何转换，例如时间，日期格式等等。
+#### 1. 嵌套对象绑定
+
+@ConfigurationProperties 支持嵌套对象的绑定：
+
+**application.yaml**
+
+```yaml
+app:
+  server:
+    host: localhost
+    port: 8080
+  database:
+    url: jdbc:mysql://localhost:3306/mydb
+    username: admin
+    password: secret
+    pool:
+      max-size: 10
+      min-size: 2
+```
+
+**Java 配置类**
+
+```java
+@Data
+@ConfigurationProperties(prefix = "app")
+@Component
+public class AppProperties {
+    private Server server;
+    private Database database;
+
+    @Data
+    public static class Server {
+        private String host;
+        private int port;
+    }
+
+    @Data
+    public static class Database {
+        private String url;
+        private String username;
+        private String password;
+        private Pool pool;
+
+        @Data
+        public static class Pool {
+            private int maxSize;
+            private int minSize;
+        }
+    }
+}
+```
+
+#### 2. 集合和Map绑定
+
+支持List、Set和Map的绑定：
+
+**application.yaml**
+
+```yaml
+app:
+  servers:
+    - host: server1
+      port: 8080
+    - host: server2
+      port: 8081
+  features:
+    logging: true
+    caching: false
+  metadata:
+    version: "1.0"
+    author: "dev"
+```
+
+**Java 类**
+
+```java
+@Data
+@ConfigurationProperties(prefix = "app")
+@Component
+public class AppProperties {
+    private List<Server> servers;
+    private Set<String> features;
+    private Map<String, String> metadata;
+
+    @Data
+    public static class Server {
+        private String host;
+        private int port;
+    }
+}
+```
+
+#### 3. 属性验证
+
+使用JSR-303注解进行验证：
+
+```java
+@Data
+@ConfigurationProperties(prefix = "app.database")
+@Component
+@Validated
+public class DatabaseProperties {
+    @NotBlank
+    private String url;
+
+    @NotBlank
+    private String username;
+
+    @NotBlank
+    private String password;
+
+    @Min(1)
+    @Max(100)
+    private int maxConnections = 10;
+
+    @Pattern(regexp = "^(mysql|postgresql|oracle)$")
+    private String driver = "mysql";
+}
+```
+
+#### 4. 自定义转换器
+
+对于复杂类型转换，可以实现Converter：
+
+```java
+@Configuration
+public class CustomConvertersConfiguration {
+    @Bean
+    public Converter<String, Duration> stringToDurationConverter() {
+        return new Converter<String, Duration>() {
+            @Override
+            public Duration convert(String source) {
+                return Duration.parse(source);
+            }
+        };
+    }
+}
+```
+
+**application.yaml**
+
+```yaml
+app:
+  timeout: PT30S  # ISO-8601 duration format
+```
+
+**Java**
+
+```java
+@Data
+@ConfigurationProperties(prefix = "app")
+@Component
+public class AppProperties {
+    private Duration timeout;
+}
+```
+
+#### 5. 枚举绑定
+
+```yaml
+app:
+  mode: DEVELOPMENT
+```
+
+```java
+public enum AppMode {
+    DEVELOPMENT, PRODUCTION, TEST
+}
+
+@Data
+@ConfigurationProperties(prefix = "app")
+@Component
+public class AppProperties {
+    private AppMode mode;
+}
+```
+
+#### 6. 多配置文件源
+
+@ConfigurationProperties 可以从多个属性源读取：
+
+```java
+@Configuration
+@PropertySource("classpath:custom.properties")
+@PropertySource("file:/external/config.properties")
+public class PropertySourcesConfig {
+    // ...
+}
+```
+
+#### 7. 与@ConfigurationPropertiesScan结合
+
+在Spring Boot 2.2+中，可以使用@ConfigurationPropertiesScan：
+
+```java
+@SpringBootApplication
+@ConfigurationPropertiesScan("com.example.config")
+public class Application {
+    // 会扫描com.example.config包下的@ConfigurationProperties类
+}
+```
+
+#### 8. 最佳实践
+
+- 使用@ConfigurationPropertiesScan而不是@EnableConfigurationProperties
+- 总是为集合和Map设置默认值
+- 使用@Validated进行验证
+- 对于复杂配置，考虑分组验证
+- 使用构造函数绑定以获得不可变对象
+
+#### 9. 测试@ConfigurationProperties
+
+```java
+@SpringBootTest
+@TestPropertySource(properties = {
+    "app.database.url=jdbc:test://localhost",
+    "app.database.username=test"
+})
+public class DatabasePropertiesTest {
+
+    @Autowired
+    private DatabaseProperties properties;
+
+    @Test
+    public void testPropertiesBinding() {
+        assertEquals("jdbc:test://localhost", properties.getUrl());
+        assertEquals("test", properties.getUsername());
+    }
+}
+```
+
+### 总结扩展
+
+@ConfigurationProperties 是Spring Boot中处理外部配置的强大工具，它提供了：
+
+- 类型安全的配置绑定
+- 嵌套对象支持
+- 集合和Map支持
+- 内置验证
+- 自定义转换器支持
+- 多属性源支持
+
+相比@Value，@ConfigurationProperties更适合复杂配置对象的绑定。
+
+### 思考
+
+- 以上实例中，实体类对应的属性配置在application.yaml,那能不能从其他自定义的yaml中配置或者从配置中心获取呢？
+- 配置的参数如何转换，例如时间，日期格式等等。
+- 如何实现配置的热更新？
+- @ConfigurationProperties与Spring Cloud Config的集成？

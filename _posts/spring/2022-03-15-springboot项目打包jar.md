@@ -255,9 +255,323 @@ integration-test阶段中的Spring Boot Maven plugin的start/stop
 </plugin>
 ```
 
+## Gradle支持
+
+对于使用Gradle的项目，配置类似：
+
+```gradle
+plugins {
+    id 'org.springframework.boot' version '2.7.0'
+    id 'java'
+}
+
+bootJar {
+    mainClass = 'com.example.Application'
+    archiveFileName = 'awesome-app.jar'
+    // 排除devtools
+    exclude '**/spring-boot-devtools-*.jar'
+}
+```
+
+## 高级配置选项
+
+### 多环境打包
+
+```xml
+<profiles>
+    <profile>
+        <id>prod</id>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <configuration>
+                        <profiles>
+                            <profile>prod</profile>
+                        </profiles>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+</profiles>
+```
+
+### 自定义Manifest
+
+```xml
+<plugin>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+    <configuration>
+        <mainClass>com.example.Application</mainClass>
+        <layout>JAR</layout>
+        <executable>true</executable>
+    </configuration>
+</plugin>
+```
+
+### 多模块项目打包
+
+对于多模块项目，可以在父模块配置插件：
+
+```xml
+<!-- 在父pom.xml中 -->
+<build>
+    <pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </pluginManagement>
+</build>
+
+<!-- 在启动模块中 -->
+<plugin>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+    <executions>
+        <execution>
+            <goals>
+                <goal>repackage</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+
+## Docker集成
+
+### 多阶段Docker构建
+
+```dockerfile
+# 构建阶段
+FROM maven:3.8.4-openjdk-11 as builder
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# 运行阶段
+FROM openjdk:11-jre-slim
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","app.jar"]
+```
+
+### Jib插件
+
+使用Google Jib进行容器化：
+
+```xml
+<plugin>
+    <groupId>com.google.cloud.tools</groupId>
+    <artifactId>jib-maven-plugin</artifactId>
+    <version>3.3.1</version>
+    <configuration>
+        <to>
+            <image>my-registry/my-app</image>
+        </to>
+    </configuration>
+</plugin>
+```
+
+## 原生镜像打包
+
+使用GraalVM创建原生镜像：
+
+```xml
+<plugin>
+    <groupId>org.graalvm.buildtools</groupId>
+    <artifactId>native-maven-plugin</artifactId>
+    <version>0.9.13</version>
+    <extensions>true</extensions>
+    <executions>
+        <execution>
+            <id>build-native</id>
+            <goals>
+                <goal>build</goal>
+            </goals>
+            <phase>package</phase>
+        </execution>
+    </executions>
+    <configuration>
+        <buildArgs>
+            <buildArg>--no-fallback</buildArg>
+        </buildArgs>
+    </configuration>
+</plugin>
+```
+
+## 安全加固
+
+### 可执行JAR签名
+
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-jarsigner-plugin</artifactId>
+    <version>3.0.0</version>
+    <executions>
+        <execution>
+            <id>sign</id>
+            <goals>
+                <goal>sign</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+
+### 依赖检查
+
+```xml
+<plugin>
+    <groupId>org.owasp</groupId>
+    <artifactId>dependency-check-maven</artifactId>
+    <version>7.1.1</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>check</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+
+## CI/CD集成
+
+### GitHub Actions示例
+
+```yaml
+name: Build and Deploy
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+    - name: Build with Maven
+      run: mvn clean package -DskipTests
+    - name: Upload JAR
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-jar
+        path: target/*.jar
+```
+
+### Jenkins Pipeline
+
+```groovy
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'java -jar target/*.jar'
+            }
+        }
+    }
+}
+```
+
+## 性能优化
+
+### JVM调优
+
+```bash
+java -server \
+  -Xms512m -Xmx1024m \
+  -XX:+UseG1GC \
+  -XX:MaxGCPauseMillis=200 \
+  -jar app.jar
+```
+
+### 应用启动优化
+
+```xml
+<plugin>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+    <configuration>
+        <mainClass>com.example.Application</mainClass>
+        <layoutFactory>
+            <type>ZIP</type>
+        </layoutFactory>
+    </configuration>
+</plugin>
+```
+
+## 故障排除
+
+### 常见问题
+
+1. **"no main manifest attribute"**：检查是否正确配置了mainClass
+
+2. **依赖冲突**：使用`mvn dependency:tree`分析依赖树
+
+3. **内存不足**：增加Maven内存：`MAVEN_OPTS="-Xmx2g"`
+
+4. **编码问题**：设置正确的文件编码
+
+5. **平台兼容性**：确保构建和运行环境一致
+
+### 调试技巧
+
+```bash
+# 启用调试
+java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 -jar app.jar
+
+# 查看JAR内容
+jar tf app.jar
+
+# 解压JAR
+jar xf app.jar
+```
+
+## 最佳实践
+
+1. **版本管理**：使用一致的Spring Boot版本
+2. **依赖管理**：定期更新依赖，检查安全漏洞
+3. **构建优化**：使用多线程构建，缓存依赖
+4. **测试集成**：在构建过程中运行测试
+5. **文档化**：记录构建和部署过程
+6. **监控**：监控应用启动时间和资源使用
+
 ***
 
 参考链接：
 
 > https://docs.spring.io/spring-boot/docs/2.5.2/maven-plugin/reference/htmlsingle/
 > https://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-maven-plugin.html
+> https://docs.spring.io/spring-boot/docs/current/reference/html/native-image.html

@@ -7,19 +7,47 @@ tags:
 ---
 
 
-# Swagger Editor
+# Swagger Editor 使用指南
 
-前面我们分别说了用`openapi`插件生成代码，用`swagger-ui`来测试api接口。那么这两个的前提都是`api`文档yaml文件的存在。那么我们怎么正确的编写
+在 API 开发流程中，编写规范的 OpenAPI 文档至关重要。Swagger Editor 提供了可视化编辑器，支持实时预览和验证 OpenAPI 规范，同时可直接测试 API 接口。
 
-yaml文件呢？今天的主角`swagger-editor`就能很方便的帮我们完成这件事，可以让我们编写的时候及时预览。
+它是编写 YAML/JSON API 文档的理想工具，支持语法高亮、错误提示和代码生成。
 
-当然，这里有个更牛的地方就是，你也可以使用预览界面去做api的测试。**可以编写边测试，而且可以实时修改api文档接口。简直不要太舒服。**
+## 主要特性
 
-## 参考文档
+- **实时预览**：编辑时右侧同步显示 API 文档。
+- **语法验证**：自动检测 OpenAPI 规范错误。
+- **Try it out**：直接在编辑器中测试 API 调用。
+- **代码生成**：内置生成客户端和服务端代码。
+- **导入/导出**：支持 YAML/JSON 格式。
 
-> https://github.com/swagger-api/swagger-editor
+## 安装方式
 
-该项目也是一个`nodejs`项目，我们可以把项目down下来本来启动，但感觉也没这个必要。我们可以直接用docker启动，简单方便。
+### Docker 启动（推荐）
+```bash
+docker pull swaggerapi/swagger-editor
+docker run -d -p 80:8080 swaggerapi/swagger-editor
+```
+
+### 高级配置
+```bash
+# 从 URL 加载现有规范
+docker run -d -p 80:8080 -e URL="https://example.com/api.yaml" swaggerapi/swagger-editor
+
+# 挂载本地文件
+docker run -d -p 80:8080 -v $(pwd)/api.yaml:/tmp/api.yaml -e SWAGGER_FILE=/tmp/api.yaml swaggerapi/swagger-editor
+
+# 自定义访问路径
+docker run -d -p 80:8080 -e BASE_URL=/editor swaggerapi/swagger-editor
+```
+
+### 本地开发
+```bash
+git clone https://github.com/swagger-api/swagger-editor
+cd swagger-editor
+npm install
+npm start
+```
 
 
 
@@ -40,24 +68,69 @@ yaml文件呢？今天的主角`swagger-editor`就能很方便的帮我们完成
 
 
 
-## 关于api文档说明
+## OpenAPI 规范编写指南
 
-那么有人肯定会问，`openapi`文档的书写要求，字段说明是哪些。可以参考如下。
+OpenAPI 3.0 规范定义了 API 文档结构。关键部分包括：
 
-> https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md
+- **info**：API 基本信息（标题、版本、描述）
+- **servers**：服务器 URL
+- **paths**：API 端点定义
+- **components**：可复用组件（schemas, parameters, responses）
 
-其实我也写的少，只是项目中看别人用到了，所有需要编写的时候，大概还是得看文档来写。
+### 编写最佳实践
+- 使用描述性名称和摘要
+- 定义详细的请求/响应 schema
+- 添加示例数据
+- 使用引用（$ref）避免重复
+- 包含安全定义
+
+参考官方文档：
+> https://swagger.io/specification/
+
+### 示例结构
+```yaml
+openapi: 3.0.0
+info:
+  title: My API
+  version: 1.0.0
+servers:
+  - url: https://api.example.com
+paths:
+  /users:
+    get:
+      summary: Get users
+      responses:
+        '200':
+          description: Success
+```
 
 
 
-## 更多
+## 代码生成功能
 
-当你访问编辑页面，你会看到工具栏还有生成服务端和客户端代码的功能。可谓是真的强大，大家可以研究下是怎么做的。
+Swagger Editor 内置代码生成器，支持多种语言和框架：
 
-不过我看到官方有另外两个项目：
+- 服务端：Spring, Node.js, Flask 等
+- 客户端：JavaScript, Python, Java 等
 
-- `https://github.com/swagger-api/swagger-codegen`
-- `https://github.com/swagger-api/swagger-parser`
+点击 "Generate Client" 或 "Generate Server" 选择目标。
 
-大致应该是基于这两个项目做的。有兴趣的朋友可以参考下。
+## 替代工具
+
+- **Stoplight Studio**：功能更丰富的桌面应用
+- **Apicurio**：在线 OpenAPI 编辑器
+- **VS Code 插件**：OpenAPI (Swagger) Editor
+- **Postman**：可导入/导出 OpenAPI 规范
+
+## 集成工作流
+
+- 与 CI/CD 集成验证规范
+- 使用 OpenAPI Generator 生成代码
+- 结合 Swagger UI 进行文档展示
+
+## 注意事项
+
+- 定期更新 Docker 镜像以获取最新功能
+- 对于复杂 API，考虑分模块定义
+- 使用版本控制管理 API 规范文件
 

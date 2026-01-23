@@ -307,8 +307,225 @@ public @interface PropertySource {
 
     这样也可以配置资源文件了。
 
-    ### 3.思考
+## 其他配置加载方式
 
-    - 通过environmentPostProcessor的资源文件如何动态设置呢
-    - environmentPostProcessor的原理是啥，是怎么动态调用的
-    - spring中resourceLoader有哪些，是怎么动态处理不同的资源的。`DefaultResourceLoader`是怎么做到的。
+### Spring Profiles
+
+使用Spring Profiles来加载不同环境的配置：
+
+```yaml
+# application-dev.properties
+app.database.url=jdbc:mysql://localhost:3306/dev_db
+app.database.username=dev_user
+
+# application-prod.properties
+app.database.url=jdbc:mysql://prod-server:3306/prod_db
+app.database.username=prod_user
+```
+
+```java
+@Configuration
+@PropertySource({
+    "classpath:application-${spring.profiles.active}.properties",
+    "classpath:custom-${spring.profiles.active}.properties"
+})
+public class ProfileConfig {
+    // 配置类
+}
+```
+
+### 命令行参数和系统属性
+
+Spring Boot支持多种外部配置源，按优先级顺序：
+
+1. 命令行参数：`--app.name=MyApp`
+2. Java系统属性：`-Dapp.name=MyApp`
+3. 操作系统环境变量
+4. Profile-specific配置文件
+5. 主配置文件（application.properties/yml）
+6. @PropertySource注解的配置
+7. 默认属性
+
+```bash
+# 命令行运行
+java -jar app.jar --app.database.url=jdbc:mysql://external:3306/db
+```
+
+### 外部配置文件
+
+从外部目录加载配置：
+
+```bash
+# 指定配置目录
+java -jar app.jar --spring.config.location=file:/external/config/
+```
+
+或者在application.properties中指定：
+
+```properties
+spring.config.location=file:/external/config/custom.properties,classpath:application.properties
+```
+
+### Spring Cloud Config
+
+集成Spring Cloud Config Server：
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-config</artifactId>
+</dependency>
+```
+
+```properties
+# bootstrap.properties
+spring.cloud.config.uri=http://config-server:8888
+spring.cloud.config.name=myapp
+spring.profiles.active=dev
+```
+
+### 多PropertySource示例
+
+```java
+@Configuration
+@PropertySources({
+    @PropertySource(value = "classpath:default.properties"),
+    @PropertySource(value = "file:/opt/config/override.properties",
+                   ignoreResourceNotFound = true),
+    @PropertySource(value = "file:/secrets/database.properties",
+                   ignoreResourceNotFound = true,
+                   encoding = "UTF-8")
+})
+public class MultiSourceConfig {
+}
+```
+
+### 自定义PropertySource
+
+实现自定义属性源：
+
+```java
+public class DatabasePropertySource extends PropertySource<Map<String, Object>> {
+
+    public DatabasePropertySource(String name, DataSource dataSource) {
+        super(name, loadPropertiesFromDatabase(dataSource));
+    }
+
+    private static Map<String, Object> loadPropertiesFromDatabase(DataSource dataSource) {
+        // 从数据库加载配置
+        Map<String, Object> properties = new HashMap<>();
+        // ... 数据库查询逻辑
+        return properties;
+    }
+
+    @Override
+    public Object getProperty(String name) {
+        return this.source.get(name);
+    }
+}
+```
+
+### 配置验证和转换
+
+```java
+@Configuration
+@ConfigurationProperties(prefix = "app.security")
+@Validated
+public class SecurityProperties {
+
+    @NotBlank
+    private String jwtSecret;
+
+    @Min(300)
+    @Max(86400)
+    private int tokenExpiration = 3600;
+
+    @Pattern(regexp = "^(SHA256|SHA512)$")
+    private String hashAlgorithm = "SHA256";
+
+    // 自定义转换器
+    private Duration sessionTimeout;
+
+    public Duration getSessionTimeout() {
+        return sessionTimeout;
+    }
+
+    public void setSessionTimeout(Duration sessionTimeout) {
+        this.sessionTimeout = sessionTimeout;
+    }
+}
+```
+
+### 测试配置加载
+
+```java
+@SpringBootTest
+@TestPropertySource(properties = {
+    "app.custom.value=test",
+    "app.database.url=jdbc:h2:mem:test"
+})
+public class ConfigTest {
+
+    @Autowired
+    private Environment environment;
+
+    @Test
+    public void testCustomProperties() {
+        assertEquals("test", environment.getProperty("app.custom.value"));
+    }
+}
+```
+
+### 配置热更新
+
+使用@ConfigurationProperties配合@RefreshScope：
+
+```java
+@Configuration
+@ConfigurationProperties(prefix = "app.dynamic")
+@RefreshScope
+public class DynamicConfig {
+    private String message = "default";
+
+    // getter/setter
+}
+```
+
+配合Spring Cloud Config可以实现配置热更新。
+
+### 最佳实践
+
+1. **使用层次化配置**：application.properties -> profile-specific -> external -> overrides
+
+2. **敏感信息加密**：使用Spring Cloud Config的加密功能
+
+3. **配置验证**：使用@Validated和JSR-303注解
+
+4. **文档化配置**：为所有配置属性添加注释
+
+5. **环境隔离**：不同环境使用不同的配置源
+
+6. **监控配置**：记录配置加载和变更
+
+7. **回退机制**：提供合理的默认值
+
+### 常见问题
+
+1. **属性不生效**：检查PropertySource优先级和覆盖规则
+
+2. **编码问题**：设置正确的encoding属性
+
+3. **路径解析**：使用正确的classpath:或file:前缀
+
+4. **循环依赖**：避免配置类之间的循环引用
+
+5. **性能影响**：大量外部配置可能影响启动时间
+
+### 思考扩展
+
+- 通过environmentPostProcessor的资源文件如何动态设置呢
+- environmentPostProcessor的原理是啥，是怎么动态调用的
+- spring中resourceLoader有哪些，是怎么动态处理不同资源的。`DefaultResourceLoader`是怎么做到的。
+- 如何实现配置的版本控制和审计？
+- 微服务架构中如何管理分布式配置？
+- 配置加载失败时的降级策略？

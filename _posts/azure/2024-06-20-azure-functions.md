@@ -259,3 +259,120 @@ func azure functionapp logstream <APP_NAME> --browser
 ```azurecli
 az group delete --name AzureFunctionsQuickstart-rg
 ```
+
+## What is Azure Functions
+
+Azure Functions is a serverless compute service that lets you run event-triggered code without having to explicitly provision or manage infrastructure. It scales automatically and charges only for the compute time used.
+
+## Supported Languages and Runtimes
+
+- C#
+- JavaScript (Node.js)
+- Python
+- Java
+- PowerShell
+- TypeScript
+
+Runtimes: .NET, Node.js, Python, Java, PowerShell.
+
+## Triggers and Bindings
+
+### Triggers
+
+Initiate function execution:
+
+- HTTP: Web requests
+- Timer: Scheduled tasks
+- Queue: Messages in storage queues
+- Event Hub: Event streams
+- Blob: File uploads/downloads
+- Cosmos DB: Database changes
+
+### Bindings
+
+Connect to data sources:
+
+- Input: Read data
+- Output: Write data
+
+Example: Queue output binding.
+
+```json
+{
+  "bindings": [
+    {
+      "type": "queue",
+      "direction": "out",
+      "name": "outputQueueItem",
+      "queueName": "outqueue",
+      "connection": "AzureWebJobsStorage"
+    }
+  ]
+}
+```
+
+In code:
+
+```python
+def main(req: func.HttpRequest, outputQueueItem: func.Out[func.QueueMessage]):
+    outputQueueItem.set("Message")
+    return "OK"
+```
+
+## More Examples
+
+### Timer Trigger
+
+```python
+def main(mytimer: func.TimerRequest) -> None:
+    logging.info('Timer triggered')
+```
+
+function.json:
+
+```json
+{
+  "bindings": [
+    {
+      "name": "mytimer",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "0 */5 * * * *"
+    }
+  ]
+}
+```
+
+### Blob Trigger
+
+```python
+def main(myblob: func.InputStream):
+    logging.info(f'Blob: {myblob.read()}')
+```
+
+## Monitoring and Logging
+
+- **Application Insights**: Integrated monitoring.
+- **Logs**: View in portal or CLI.
+- **Metrics**: CPU, memory, executions.
+
+Enable: `az monitor app-insights component create --app <APP_NAME> --location <REGION>`
+
+## Best Practices
+
+- **Stateless Functions**: Avoid storing state between executions.
+- **Optimize Cold Starts**: Use premium plans for faster starts.
+- **Error Handling**: Implement try-except and logging.
+- **Security**: Use managed identities, avoid secrets in code.
+
+## Troubleshooting
+
+- **Function Not Triggering**: Check bindings and connections.
+- **Timeouts**: Increase timeout in host.json.
+- **Deployment Failures**: Verify runtime versions and dependencies.
+
+## Additional Resources
+
+- [Azure Functions Documentation](https://docs.microsoft.com/en-us/azure/azure-functions/)
+- [Python Developer Guide](https://docs.microsoft.com/en-us/azure/azure-functions/functions-reference-python)
+- [Samples](https://github.com/Azure/azure-functions-python-samples)

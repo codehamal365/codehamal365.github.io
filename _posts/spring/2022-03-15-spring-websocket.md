@@ -781,6 +781,187 @@ public class ReactiveWebSocket {
 
 ```
 
+## 高级特性
+
+### STOMP over WebSocket
+
+STOMP (Simple Text Oriented Messaging Protocol) 提供了一个基于帧的协议，支持消息代理和发布订阅模式。
+
+**服务端配置：**
+
+```java
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic", "/queue");
+        config.setApplicationDestinationPrefixes("/app");
+    }
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("*")
+                .withSockJS();
+    }
+}
+```
+
+**控制器：**
+
+```java
+@Controller
+public class WebSocketController {
+
+    @MessageMapping("/hello")
+    @SendTo("/topic/greetings")
+    public Greeting greeting(HelloMessage message) throws Exception {
+        Thread.sleep(1000); // simulated delay
+        return new Greeting("Hello, " + HtmlUtils.htmlEscape(message.getName()) + "!");
+    }
+}
+```
+
+**客户端：**
+
+```javascript
+var stompClient = null;
+
+function connect() {
+    var socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function (frame) {
+        stompClient.subscribe('/topic/greetings', function (greeting) {
+            showGreeting(JSON.parse(greeting.body).content);
+        });
+    });
+}
+
+function sendName() {
+    stompClient.send("/app/hello", {}, JSON.stringify({'name': $("#name").val()}));
+}
+```
+
+### 安全性配置
+
+为WebSocket添加安全控制：
+
+```java
+@Configuration
+public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
+
+    @Override
+    protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
+        messages
+            .simpDestMatchers("/app/**").authenticated()
+            .simpDestMatchers("/topic/**").permitAll()
+            .anyMessage().authenticated();
+    }
+
+    @Override
+    protected boolean sameOriginDisabled() {
+        return true;
+    }
+}
+```
+
+### SockJS回退
+
+SockJS提供WebSocket的回退机制，当WebSocket不可用时自动降级到其他传输方式：
+
+```java
+@Configuration
+@EnableWebSocket
+public class WebSocketConfig implements WebSocketConfigurer {
+
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(myHandler(), "/ws")
+                .setAllowedOrigins("*")
+                .withSockJS()
+                .setHeartbeatValue(new long[]{10000, 20000}); // 心跳间隔
+    }
+}
+```
+
+### 集群和可扩展性
+
+在分布式环境中，可以使用消息代理如RabbitMQ：
+
+```java
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableStompBrokerRelay("/topic", "/queue")
+              .setRelayHost("localhost")
+              .setRelayPort(61613)
+              .setClientLogin("guest")
+              .setClientPasscode("guest");
+        config.setApplicationDestinationPrefixes("/app");
+    }
+}
+```
+
+### 错误处理和重连
+
+客户端重连逻辑：
+
+```javascript
+function connect() {
+    var socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
+        setConnected(true);
+    }, function (error) {
+        console.log('STOMP error ' + error);
+        setTimeout(connect, 5000); // 5秒后重连
+    });
+}
+```
+
+### 测试WebSocket端点
+
+使用Spring的WebSocket测试支持：
+
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class WebSocketTest {
+
+    @Autowired
+    private WebSocketTestUtils webSocketTestUtils;
+
+    @Test
+    public void testWebSocket() throws Exception {
+        WebSocketSession session = webSocketTestUtils.connect("/ws");
+        session.sendMessage(new TextMessage("Hello"));
+        // 验证响应
+    }
+}
+```
+
+### 性能优化
+
+- 使用二进制消息而不是文本消息以减少带宽
+- 实现消息压缩
+- 使用连接池
+- 监控连接数和消息速率
+
+### 常见用例
+
+1. **实时聊天应用**
+2. **在线游戏**
+3. **金融交易平台**
+4. **协作编辑工具**
+5. **实时监控仪表板**
+6. **推送通知系统**
+
 Java-WebSocket
 ==============
 

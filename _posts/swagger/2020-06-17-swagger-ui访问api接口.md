@@ -7,21 +7,51 @@ tags:
 ---
 
 
-# 写在前面
+# Swagger UI：API 接口可视化测试工具
 
-之前我们写过可以通过`openapi`的插件快速生成代码(包括我们常用的model、api的接口等)，这样我们就能快速开发业务了。那么接口开发完成后，我们除了通过ut测试接口的完备性，同样也可以通过`postman`来测试接口是否正确。那么`postman`有一个问题就是，我们需要手动去配入接口的路径和参数，那么有人可能就说了，一个人配置后共享配置的`json`文件就行了，可行是可行，甚至还有在线的类型共享测试接口的开源软件。
+在 API 开发完成后，需要高效的测试工具。Swagger UI 提供基于 OpenAPI 规范的交互式文档，支持直接在浏览器中测试 API，无需额外配置。
 
-我们今天其实并不关心这个问题，我们关心我们自己开发的时候如何去快速测试接口，提高效率，并不是来考虑团队协作之类的。
+相比 Postman，Swagger UI 直接从规范生成测试界面，更适合开发阶段快速验证。
 
-那么主角`swagger-ui`就来了,我们一起看看吧。
+## 主要特性
 
-# 官方资料
+- **交互式文档**：自动生成 API 文档界面
+- **在线测试**：直接在页面执行 API 调用
+- **多种格式支持**：YAML/JSON OpenAPI 规范
+- **响应预览**：显示请求/响应详情
+- **认证支持**：Bearer Token, API Key 等
 
-官方资料可参考
+## Spring Boot 集成
+
+对于 Spring Boot 项目，最简单的方式是添加依赖：
+
+```xml
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.0.2</version>
+</dependency>
+```
+
+配置类：
+```java
+@Configuration
+public class SwaggerConfig {
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .info(new Info().title("My API").version("1.0"));
+    }
+}
+```
+
+访问：http://localhost:8080/swagger-ui.html
+
+## 官方资料
 
 > https://github.com/swagger-api/swagger-ui
 
-说明以下，这是一个`nodejs`项目，我们可以先安装`node`环境。然后体验本地dev开发。
+这是一个 Node.js 项目，支持本地开发和 Docker 部署。
 
 ## dev开发说明
 
@@ -58,17 +88,68 @@ tags:
 
 
 
-## docker启动swagger-ui
+## Docker 部署
 
-步骤。
+### 基本启动
+```bash
+docker pull swaggerapi/swagger-ui
+docker run -d -p 8080:8080 --name swagger-ui swaggerapi/swagger-ui
+```
 
-1. `docker pull swaggerapi/swagger-ui`
-2. `docker run  --name swagger-ui -p 8888:8080 -e BASE_URL=/swagger -e SWAGGER_JSON=/foo/api.yml -v ~/tmp/api:/foo swaggerapi/swagger-ui`
+### 高级配置
+```bash
+# 指定 API 规范 URL
+docker run -d -p 8080:8080 \
+  -e SWAGGER_JSON_URL=https://petstore.swagger.io/v2/swagger.json \
+  swaggerapi/swagger-ui
 
-3. 访问`http://localhost:8888/swagger`就可以看到ui界面了。
+# 挂载本地文件
+docker run -d -p 8080:8080 \
+  -v $(pwd)/api.yaml:/app/api.yaml \
+  -e SWAGGER_JSON=/app/api.yaml \
+  swaggerapi/swagger-ui
 
-这里我们配置了`BASE_URL`即是host后面的路径，通过volume配置了api的路径。
+# 自定义访问路径和标题
+docker run -d -p 8080:8080 \
+  -e BASE_URL=/docs \
+  -e SWAGGER_JSON_URL=https://api.example.com/swagger.json \
+  swaggerapi/swagger-ui
+```
 
-关于docker的更多配置可以参考[配置](https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/configuration.md#docker)。
+访问：http://localhost:8080/docs
 
-当然我们也可以对官方的镜像做定制来满足我们的各种需求。后面如果有时间，会写一篇文章。
+### 环境变量
+- `SWAGGER_JSON`：本地 JSON 文件路径
+- `SWAGGER_JSON_URL`：远程规范 URL
+- `BASE_URL`：UI 访问路径
+- `VALIDATOR_URL`：规范验证器 URL
+
+更多配置参考：[官方文档](https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/configuration.md#docker)
+
+## 替代工具
+
+- **ReDoc**：专注于文档展示的工具
+- **Postman**：功能强大的 API 测试平台
+- **Insomnia**：现代化的 API 客户端
+- **Stoplight**：企业级 API 设计平台
+
+## 最佳实践
+
+- **安全配置**：生产环境限制访问，添加认证
+- **版本管理**：为 API 规范建立版本控制
+- **自动化集成**：与 CI/CD 集成自动生成文档
+- **性能监控**：监控 API 响应时间和错误率
+
+## 自定义主题
+
+可以通过 CSS 自定义 UI 外观：
+
+```html
+<link rel="stylesheet" type="text/css" href="custom.css" />
+```
+
+## 故障排除
+
+- **CORS 问题**：确保 API 支持跨域请求
+- **规范错误**：使用在线验证器检查 OpenAPI 文件
+- **加载失败**：检查网络连接和文件路径
