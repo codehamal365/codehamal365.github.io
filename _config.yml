@@ -1,88 +1,18 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that. If you find
-# yourself editing this file very often, consider using Jekyll's data files
-# feature for the data you need to update frequently.
-#
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
-
-# Site Settings
-locale: "en-US"
 title: "Wei's Blog"
-subtitle: "Plan, prioritize, execute"
-description: "Wei's Blog notes."
-url: "https://codehamal365.github.io" # the base hostname & protocol for your site
+email: codehamal@gmail.com
+description: >- # this means to ignore newlines until "baseurl:"
+  Wei's Blog notes. Plan, prioritize, execute.
 baseurl: "" # the subpath of your site, e.g. /blog
-logo: # "/assets/images/logo.png"
-search: true
-
-# User Settings
-author:
-  name: "Wei"
-  avatar: "/assets/avatar.png" # Migrated from Chirpy
-  bio: "Plan, prioritize, execute"
-  location: "Shanghai" # Inferred from timezone
-  email: "codehamal@gmail.com"
-  links:
-    - label: "GitHub"
-      icon: "fab fa-fw fa-github"
-      url: "https://github.com/codehamal365"
-    - label: "Twitter"
-      icon: "fab fa-fw fa-twitter"
-      url: "https://twitter.com/username" # Placeholder from old config
+url: "https://codehamal365.github.io" # the base hostname & protocol for your site
+twitter_username: username
+github_username: codehamal365
 
 # Build settings
-theme: minimal-mistakes-jekyll
-
+theme: minima
 plugins:
   - jekyll-feed
-  - jekyll-gist
-  - jekyll-paginate
-  - jekyll-sitemap
   - jekyll-include-cache
-  - jekyll-archives
 
-# Minimal Mistakes Skin
-minimal_mistakes_skin: "default" # "air", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
-
-# Pagination
-paginate: 10
-paginate_path: "/page:num/"
-
-# Timezone
-timezone: Asia/Shanghai
-
-# Structure
-defaults:
-  # _posts
-  - scope:
-      path: ""
-      type: posts
-    values:
-      layout: single
-      author_profile: true
-      read_time: true
-      comments: true
-      share: true
-      related: true
-  # _pages
-  - scope:
-      path: ""
-      type: pages
-    values:
-      layout: single
-      author_profile: true
-
-# Archives
-jekyll-archives:
-  enabled:
-    - categories
-    - tags
-  layouts:
-    category: archive-taxonomy
-    tag: archive-taxonomy
-  permalinks:
-    category: /categories/:name/
-    tag: /tags/:name/
+# Minima specific settings
+header_pages:
+  - about.md

@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 
-gem "minimal-mistakes-jekyll"
+gem "minima", "~> 2.5"
 gem "jekyll-archives"
 gem "jekyll-paginate"
 gem "jekyll-sitemap"
