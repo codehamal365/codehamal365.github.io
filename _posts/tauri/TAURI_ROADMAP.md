@@ -1,0 +1,1384 @@
+---
+title: Tauri 学习路线图
+categories:
+  - Tauri
+tags:
+  - Tauri
+  - 路线图
+  - 学习
+  - 桌面应用
+---
+
+# Tauri 学习路线图
+
+> 从零基础到精通的完整学习路径
+
+---
+
+## 📚 目录
+
+- [学习阶段概览](#学习阶段概览)
+- [阶段 1: 基础入门](#阶段-1-基础入门)
+- [阶段 2: 核心概念](#阶段-2-核心概念)
+- [阶段 3: 高级特性](#阶段-3-高级特性)
+- [阶段 4: 实战项目](#阶段-4-实战项目)
+- [阶段 5: 专家级](#阶段-5-专家级)
+- [学习资源](#学习资源)
+- [时间规划](#时间规划)
+
+---
+
+## 学习阶段概览
+
+```
+阶段 1: 基础入门 (1-2周)
+├── 安装和配置
+├── 项目结构
+├── 基础语法
+├── 简单应用
+└── 基础调试
+
+阶段 2: 核心概念 (2-3周)
+├── IPC 通信
+├── 窗口管理
+├── 菜单系统
+├── 插件系统
+└── 状态管理
+
+阶段 3: 高级特性 (2-3周)
+├── 异步编程
+├── 并发处理
+├── 性能优化
+├── 安全加固
+└── 自定义插件
+
+阶段 4: 实战项目 (3-4周)
+├── 文件管理器
+├── 数据可视化
+├── 实时应用
+├── 系统工具
+└── 生产部署
+
+阶段 5: 专家级 (持续)
+├── 架构设计
+├── 性能调优
+├── 贡献开源
+├── 社区建设
+└── 技术分享
+```
+
+---
+
+## 阶段 1: 基础入门 (1-2周)
+
+### 目标
+- ✅ 安装 Tauri 开发环境
+- ✅ 理解项目结构
+- ✅ 掌握基础语法
+- ✅ 构建简单应用
+- ✅ 学会基本调试
+
+### 学习内容
+
+#### 1.1 环境搭建
+```bash
+# 安装 Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# 安装 Node.js (推荐使用 nvm)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+# 安装 Tauri CLI
+cargo install tauri-cli
+
+# 验证安装
+tauri --version
+```
+
+#### 1.2 创建项目
+```bash
+# 使用 create-tauri-app
+npm create tauri-app@latest
+
+# 或手动创建
+mkdir my-app
+cd my-app
+npm init -y
+npm install @tauri-apps/api
+```
+
+#### 1.3 项目结构
+```
+my-app/
+├── src/
+│   ├── main.ts          # 入口文件
+│   ├── App.tsx          # 主组件
+│   └── index.css        # 样式
+├── src-tauri/
+│   ├── src/
+│   │   └── main.rs      # Rust 主程序
+│   ├── tauri.conf.json  # Tauri 配置
+│   └── Cargo.toml       # Rust 依赖
+├── index.html           # HTML 入口
+├── package.json         # npm 依赖
+└── vite.config.ts       # 构建配置
+```
+
+#### 1.4 基础配置
+```json
+// tauri.conf.json
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "MyApp",
+  "version": "1.0.0",
+  "identifier": "com.myapp.app",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "MyApp",
+        "width": 800,
+        "height": 600
+      }
+    ]
+  }
+}
+```
+
+#### 1.5 基础命令
+```rust
+// src-tauri/src/main.rs
+#
+![cfg_attr(not(debug_assertions)
+, windows_subsystem = "windows")]
+
+#[tauri::command]
+fn greet(name: &str) -> String {
+    format!("Hello, {}! You've been greeted from Rust!", name)
+}
+
+fn main() {
+    tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler
+![greet])
+
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}
+```
+
+#### 1.6 前端调用
+```tsx
+// src/App.tsx
+import { useState } from 'react';
+import { invoke } from '@tauri-apps/api/core';
+
+function App() {
+    const [message, setMessage] = useState('');
+
+    const handleClick = async () => {
+        const result = await invoke('greet', { name: 'World' });
+        setMessage(result);
+    };
+
+    return (
+        <div className="container">
+            <h1>Welcome to Tauri!</h1>
+            <button onClick={handleClick}>Greet</button>
+            <p>{message}</p>
+        </div>
+    );
+}
+
+export default App;
+```
+
+#### 1.7 运行项目
+```bash
+# 开发模式
+npm run tauri:dev
+
+# 构建生产版本
+npm run tauri:build
+
+# 检查配置
+npm run tauri:info
+```
+
+#### 1.8 基础调试
+```bash
+# 查看日志
+# macOS: ~/Library/Logs/<your-app-name>/main.log
+# Windows: %APPDATA%\<your-app-name>\logs\main.log
+# Linux: ~/.config/<your-app-name>/logs/main.log
+
+# 打开开发者工具
+# 在开发模式下按 F12
+```
+
+### 实践项目
+- **Hello Tauri** - 简单的问候应用
+- **Counter App** - 计数器应用
+- **Todo List** - 待办事项列表
+
+### 推荐资源
+- [Tauri 官网](https://tauri.app/)
+- [Tauri 文档 - 快速开始](https://tauri.app/v2/guides/getting-started/)
+- [create-tauri-app](https://github.com/tauri-apps/create-tauri-app)
+
+---
+
+## 阶段 2: 核心概念 (2-3周)
+
+### 目标
+- ✅ 理解 IPC 通信机制
+- ✅ 掌握窗口管理
+- ✅ 学会菜单系统
+- ✅ 理解插件系统
+- ✅ 掌握状态管理
+
+### 学习内容
+
+#### 2.1 IPC 通信
+```rust
+// 多个命令
+#[tauri::command]
+fn add(a: i32, b: i32) -> i32 {
+    a + b
+}
+
+#[tauri::command]
+fn multiply(a: i32, b: i32) -> i32 {
+    a * b
+}
+
+fn main() {
+    tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler
+![add, multiply])
+
+        .run(tauri::generate_context!())
+        .expect("error");
+}
+```
+
+```js
+// 批量调用
+const results = await Promise.all([
+    invoke('add', { a: 2, b: 3 }),
+    invoke('multiply', { a: 4, b: 5 })
+]);
+```
+
+#### 2.2 窗口管理
+```rust
+use tauri::{Window, WindowBuilder};
+
+#[tauri::command]
+fn create_window(app: tauri::AppHandle) -> Result<(), String> {
+    let window = WindowBuilder::new(
+        &app,
+        "secondary",
+        tauri::WindowUrl::App("index.html".into())
+    )
+    .title("Secondary Window")
+    .inner_size(400.0, 300.0)
+    .visible(true)
+    .decorations(true)
+    .resizable(true)
+    .build()
+    .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+```
+
+#### 2.3 菜单系统
+```rust
+use tauri::{Menu, MenuItem, Submenu, CustomMenuItem};
+
+fn create_menu() -> Menu {
+    let file_menu = Submenu::new(
+        "File",
+        Menu::new()
+            .add_item(MenuItem::new("Open"))
+            .add_item(MenuItem::new("Save"))
+            .add_item(MenuItem::new("Close"))
+    );
+
+    let edit_menu = Submenu::new(
+        "Edit",
+        Menu::new()
+            .add_item(MenuItem::new("Undo"))
+            .add_item(MenuItem::new("Redo"))
+            .add_item(MenuItem::new("Copy"))
+            .add_item(MenuItem::new("Paste"))
+    );
+
+    Menu::new()
+        .add_submenu(file_menu)
+        .add_submenu(edit_menu)
+}
+```
+
+#### 2.4 插件系统
+```rust
+// 使用插件
+use tauri_plugin_dialog::DialogPlugin;
+use tauri_plugin_fs::FsPlugin;
+use tauri_plugin_shell::ShellPlugin;
+
+fn main() {
+    tauri::Builder::default()
+        .plugin(DialogPlugin::new())
+        .plugin(FsPlugin::new())
+        .plugin(ShellPlugin::new())
+        .run(tauri::generate_context!())
+        .expect("error");
+}
+```
+
+#### 2.5 状态管理
+```rust
+use std::sync::Mutex;
+
+struct AppState {
+    counter: Mutex<i32>,
+}
+
+#[tauri::command]
+fn increment_counter(state: tauri::State<'_, AppState>) -> i32 {
+    let mut counter = state.counter.lock().unwrap();
+    *counter += 1;
+    *counter
+}
+
+fn main() {
+    tauri::Builder::default()
+        .manage(AppState {
+            counter: Mutex::new(0),
+        })
+        .invoke_handler(tauri::generate_handler
+![increment_counter])
+
+        .run(tauri::generate_context!())
+        .expect("error");
+}
+```
+
+#### 2.6 文件操作
+```rust
+use std::fs;
+
+#[tauri::command]
+fn read_file(path: &str) -> Result<String, String> {
+    fs::read_to_string(path).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn write_file(path: &str, content: &str) -> Result<(), String> {
+    fs::write(path, content).map_err(|e| e.to_string())
+}
+```
+
+#### 2.7 系统命令
+```rust
+use tauri_plugin_shell::ShellPlugin;
+
+#[tauri::command]
+async fn execute_command(command: &str, args: Vec<&str>) -> Result<String, String> {
+    use tauri_plugin_shell::process::Command;
+
+    let output = Command::new(command)
+        .args(args)
+        .output()
+        .map_err(|e| e.to_string())?;
+
+    Ok(String::from_utf8_lossy(&output.stdout).to_string())
+}
+```
+
+#### 2.8 通知系统
+```rust
+use tauri_plugin_notification::NotificationPlugin;
+
+#[tauri::command]
+fn send_notification(title: &str, body: &str) -> Result<(), String> {
+    tauri::api::notification::Notification::new("com.example.app")
+        .title(title)
+        .body(body)
+        .show()
+        .map_err(|e| e.to_string())
+}
+```
+
+### 实践项目
+- **文件管理器** - 浏览和管理文件
+- **系统监控器** - 监控系统资源
+- **聊天应用** - 实时消息通信
+
+### 推荐资源
+- [Tauri API 参考](https://tauri.app/v2/api/)
+- [Tauri 插件](https://tauri.app/plugin/)
+- [Tauri 示例](https://github.com/tauri-apps/tauri/tree/dev/examples)
+
+---
+
+## 阶段 3: 高级特性 (2-3周)
+
+### 目标
+- ✅ 掌握异步编程
+- ✅ 学会并发处理
+- ✅ 理解性能优化
+- ✅ 掌握安全加固
+- ✅ 学会自定义插件
+
+### 学习内容
+
+#### 3.1 异步编程
+```rust
+use tokio::time::{sleep, Duration};
+
+#[tauri::command]
+async fn long_running_task() -> Result<String, String> {
+    sleep(Duration::from_secs(2)).await;
+    Ok("Task completed".to_string())
+}
+```
+
+#### 3.2 并发处理
+```rust
+use tokio::task;
+
+#[tauri::command]
+async fn parallel_processing(items: Vec<String>) -> Result<Vec<String>, String> {
+    let tasks: Vec<_> = items
+        .into_iter()
+        .map(|item| {
+            task::spawn(async move {
+                sleep(Duration::from_millis(100)).await;
+                format!("Processed: {}", item)
+            })
+        })
+        .collect();
+
+    let results = futures::future::join_all(tasks)
+        .await
+        .into_iter()
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| e.to_string())?;
+
+    Ok(results)
+}
+```
+
+#### 3.3 性能优化
+```rust
+use once_cell::sync::OnceCell;
+
+static DATABASE: OnceCell<Database> = OnceCell::new();
+
+fn get_database() -> &'static Database {
+    DATABASE.get_or_init(|| {
+        // 延迟初始化
+        Database::new()
+    })
+}
+
+#[tauri::command]
+fn query_data() -> Result<Vec<Record>, String> {
+    let db = get_database();
+    db.query().map_err(|e| e.to_string())
+}
+```
+
+#### 3.4 安全加固
+```rust
+use validator::Validate;
+
+#[derive(Validate, serde::Deserialize)]
+struct UserInput {
+    #[validate(length(min = 1, max = 100))]
+    name: String,
+
+    #[validate(email)]
+    email: String,
+
+    #[validate(range(min = 1, max = 100))]
+    age: u32,
+}
+
+#[tauri::command]
+fn validate_user_input(input: UserInput) -> Result<(), String> {
+    input.validate().map_err(|e| e.to_string())
+}
+```
+
+#### 3.5 自定义插件
+```rust
+// src-tauri/src/plugins/my_plugin.rs
+use tauri::{plugin::{Plugin, Result}, AppHandle, Invoke, Manager, Runtime};
+
+pub struct MyPlugin {
+    config: MyPluginConfig,
+}
+
+#[derive(serde::Deserialize)]
+pub struct MyPluginConfig {
+    pub enabled: bool,
+}
+
+impl<R: Runtime> Plugin<R> for MyPlugin {
+    fn name(&self) -> &'static str {
+        "my-plugin"
+    }
+
+    fn initialize(&mut self, app: &AppHandle<R>, config: serde_json::Value) -> Result<()> {
+        // 初始化插件
+        Ok(())
+    }
+
+    fn extend_api(&mut self, invoke: Invoke<R>) -> Result<()> {
+        let handler = invoke.message;
+        let cmd = handler.command();
+
+        match cmd {
+            "my_command" => {
+                // 处理命令
+                Ok(())
+            }
+            _ => Err(anyhow::anyhow!("Unknown command").into()),
+        }
+    }
+}
+```
+
+#### 3.6 错误处理
+```rust
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum AppError {
+    #[error("IO error: {0}")]
+    Io(#[from] std::io::Error),
+
+    #[error("JSON error: {0}")]
+    Json(#[from] serde_json::Error),
+
+    #[error("Database error: {0}")]
+    Database(String),
+
+    #[error("Network error: {0}")]
+    Network(String),
+
+    #[error("Validation error: {0}")]
+    Validation(String),
+}
+
+impl serde::Serialize for AppError {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.to_string())
+    }
+}
+```
+
+#### 3.7 状态持久化
+```rust
+use serde::{Serialize, Deserialize};
+use std::fs;
+
+#[derive(Serialize, Deserialize, Clone)]
+struct PersistentState {
+    user_id: String,
+    settings: Settings,
+}
+
+#[tauri::command]
+fn save_state(state: PersistentState) -> Result<(), String> {
+    let json = serde_json::to_string(&state)
+        .map_err(|e| e.to_string())?;
+
+    fs::write("state.json", json)
+        .map_err(|e| e.to_string())
+}
+```
+
+#### 3.8 性能监控
+```rust
+use std::time::Instant;
+
+#[tauri::command]
+fn profiled_operation() -> Result<(), String> {
+    let start = Instant::now();
+
+    // 执行操作
+    let result = expensive_operation();
+
+    let duration = start.elapsed();
+    println!("Operation took: {:?}", duration);
+
+    result
+}
+```
+
+### 实践项目
+- **文件同步器** - 多线程文件同步
+- **数据可视化** - 实时图表展示
+- **系统工具箱** - 综合系统工具
+
+### 推荐资源
+- [Tokio 文档](https://tokio.rs/)
+- [Tauri 安全指南](https://tauri.app/v2/security/)
+- [Rust 异步编程](https://rust-lang.github.io/async-book/)
+
+---
+
+## 阶段 4: 实战项目 (3-4周)
+
+### 目标
+- ✅ 构建完整应用
+- ✅ 集成多种技术
+- ✅ 处理复杂场景
+- ✅ 优化用户体验
+- ✅ 学习生产部署
+
+### 项目 1: 文件管理器
+
+#### 功能需求
+- ✅ 浏览文件系统
+- ✅ 文件操作（复制、移动、删除）
+- ✅ 文件预览
+- ✅ 搜索功能
+- ✅ 批量操作
+
+#### 技术栈
+- Tauri + React + TypeScript
+- Tauri FS 插件
+- Tauri Shell 插件
+- Tauri Dialog 插件
+
+#### 核心代码
+```rust
+// 文件操作命令
+#[tauri::command]
+async fn list_files(path: &str) -> Result<Vec<FileInfo>, String> {
+    let entries = tokio::fs::read_dir(path)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    let mut files = Vec::new();
+    while let Some(entry) = entries.next_entry().await.map_err(|e| e.to_string())? {
+        let metadata = entry.metadata().await.map_err(|e| e.to_string())?;
+        files.push(FileInfo {
+            name: entry.file_name().to_string_lossy().to_string(),
+            path: entry.path().to_string_lossy().to_string(),
+            is_dir: metadata.is_dir(),
+            size: metadata.len(),
+        });
+    }
+
+    Ok(files)
+}
+
+#[tauri::command]
+async fn copy_file(source: &str, destination: &str) -> Result<(), String> {
+    tokio::fs::copy(source, destination)
+        .await
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+```
+
+#### 前端组件
+```tsx
+// FileBrowser.tsx
+import { useState, useEffect } from 'react';
+import { invoke } from '@tauri-apps/api/core';
+
+interface FileInfo {
+    name: string;
+    path: string;
+    is_dir: boolean;
+    size: number;
+}
+
+function FileBrowser() {
+    const [files, setFiles] = useState<FileInfo[]>([]);
+    const [currentPath, setCurrentPath] = useState('/');
+
+    useEffect(() => {
+        loadFiles(currentPath);
+    }, [currentPath]);
+
+    const loadFiles = async (path: string) => {
+        try {
+            const result = await invoke<FileInfo[]>('list_files', { path });
+            setFiles(result);
+        } catch (error) {
+            console.error('Failed to load files:', error);
+        }
+    };
+
+    const handleDoubleClick = (file: FileInfo) => {
+        if (file.is_dir) {
+            setCurrentPath(file.path);
+        }
+    };
+
+    return (
+        <div className="file-browser">
+            <div className="path-bar">{currentPath}</div>
+            <div className="file-list">
+                {files.map(file => (
+                    <div
+                        key={file.path}
+                        className="file-item"
+                        onDoubleClick={() => handleDoubleClick(file)}
+                    >
+                        <span className={file.is_dir ? 'folder' : 'file'}>
+                            {file.name}
+                        </span>
+                        <span className="size">
+                            {file.is_dir ? 'DIR' : formatSize(file.size)}
+                        </span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+```
+
+### 项目 2: 数据可视化仪表盘
+
+#### 功能需求
+- ✅ 实时数据监控
+- ✅ 图表展示
+- ✅ 数据导出
+- ✅ 告警系统
+- ✅ 历史数据
+
+#### 技术栈
+- Tauri + React + TypeScript
+- Chart.js / ECharts
+- Tauri HTTP 插件
+- Tauri Store 插件
+
+#### 核心代码
+```rust
+// 数据采集命令
+#[tauri::command]
+async fn fetch_metrics() -> Result<Metrics, String> {
+    let cpu = get_cpu_usage().await?;
+    let memory = get_memory_usage().await?;
+    let disk = get_disk_usage().await?;
+
+    Ok(Metrics {
+        timestamp: std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs(),
+        cpu,
+        memory,
+        disk,
+    })
+}
+
+#[tauri::command]
+async fn export_data(format: &str) -> Result<String, String> {
+    let data = fetch_metrics().await?;
+
+    match format {
+        "json" => Ok(serde_json::to_string(&data).unwrap()),
+        "csv" => {
+            let csv = format!(
+                "timestamp,cpu,memory,disk\n{},{},{},{}",
+                data.timestamp, data.cpu, data.memory, data.disk
+            );
+            Ok(csv)
+        }
+        _ => Err("Unsupported format".to_string()),
+    }
+}
+```
+
+#### 前端组件
+```tsx
+// Dashboard.tsx
+import { useState, useEffect } from 'react';
+import { invoke } from '@tauri-apps/api/core';
+import { Line } from 'react-chartjs-2';
+
+interface Metrics {
+    timestamp: number;
+    cpu: number;
+    memory: number;
+    disk: number;
+}
+
+function Dashboard() {
+    const [metrics, setMetrics] = useState<Metrics[]>([]);
+    const [isMonitoring, setIsMonitoring] = useState(false);
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+
+        if (isMonitoring) {
+            interval = setInterval(async () => {
+                try {
+                    const data = await invoke<Metrics>('fetch_metrics');
+                    setMetrics(prev => [...prev.slice(-50), data]);
+                } catch (error) {
+                    console.error('Failed to fetch metrics:', error);
+                }
+            }, 1000);
+        }
+
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [isMonitoring]);
+
+    const handleExport = async (format: string) => {
+        try {
+            const data = await invoke<string>('export_data', { format });
+            // 下载文件
+            const blob = new Blob([data], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `metrics.${format}`;
+            a.click();
+        } catch (error) {
+            console.error('Export failed:', error);
+        }
+    };
+
+    return (
+        <div className="dashboard">
+            <div className="controls">
+                <button onClick={() => setIsMonitoring(!isMonitoring)}>
+                    {isMonitoring ? '停止监控' : '开始监控'}
+                </button>
+                <button onClick={() => handleExport('json')}>导出 JSON</button>
+                <button onClick={() => handleExport('csv')}>导出 CSV</button>
+            </div>
+
+            <div className="charts">
+                <Line
+                    data={{
+                        labels: metrics.map(m => new Date(m.timestamp * 1000).toLocaleTimeString()),
+                        datasets: [
+                            {
+                                label: 'CPU %',
+                                data: metrics.map(m => m.cpu),
+                                borderColor: 'rgb(255, 99, 132)',
+                            },
+                            {
+                                label: 'Memory %',
+                                data: metrics.map(m => m.memory),
+                                borderColor: 'rgb(54, 162, 235)',
+                            },
+                        ],
+                    }}
+                />
+            </div>
+        </div>
+    );
+}
+```
+
+### 项目 3: 实时聊天应用
+
+#### 功能需求
+- ✅ WebSocket 实时通信
+- ✅ 用户认证
+- ✅ 消息历史
+- ✅ 文件传输
+- ✅ 群组聊天
+
+#### 技术栈
+- Tauri + React + TypeScript
+- WebSocket
+- Tauri HTTP 插件
+- Tauri Store 插件
+
+#### 核心代码
+```rust
+// WebSocket 连接
+use tokio_tungstenite::{connect_async, tungstenite::protocol::Message};
+use futures_util::{SinkExt, StreamExt};
+
+#[tauri::command]
+async fn connect_chat(url: &str) -> Result<(), String> {
+    let (ws_stream, _) = connect_async(url)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    let (mut write, mut read) = ws_stream.split();
+
+    // 处理消息
+    tokio::spawn(async move {
+        while let Some(message) = read.next().await {
+            match message {
+                Ok(Message::Text(text)) => {
+                    // 发送到前端
+                    println!("Received: {}", text);
+                }
+                Ok(Message::Binary(data)) => {
+                    // 处理二进制数据
+                    println!("Received binary: {} bytes", data.len());
+                }
+                _ => {}
+            }
+        }
+    });
+
+    Ok(())
+}
+
+#[tauri::command]
+async fn send_message(ws: &str, message: &str) -> Result<(), String> {
+    // 发送消息到 WebSocket
+    // 实际实现需要维护连接状态
+    Ok(())
+}
+```
+
+### 项目 4: 系统工具箱
+
+#### 功能需求
+- ✅ 进程管理
+- ✅ 网络监控
+- ✅ 磁盘分析
+- ✅ 系统信息
+- ✅ 性能调优
+
+#### 技术栈
+- Tauri + React + TypeScript
+- Tauri Shell 插件
+- Tauri FS 插件
+- 系统命令
+
+#### 核心代码
+```rust
+// 进程管理
+#[tauri::command]
+async fn list_processes() -> Result<Vec<ProcessInfo>, String> {
+    #[cfg(target_os = "windows")]
+    {
+        let output = Command::new("tasklist")
+            .output()
+            .await
+            .map_err(|e| e.to_string())?;
+
+        let output_str = String::from_utf8_lossy(&output.stdout);
+        let processes = parse_tasklist(&output_str);
+        Ok(processes)
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("ps")
+            .args(["-eo", "pid,comm,%cpu,%mem"])
+            .output()
+            .await
+            .map_err(|e| e.to_string())?;
+
+        let output_str = String::from_utf8_lossy(&output.stdout);
+        let processes = parse_ps(&output_str);
+        Ok(processes)
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        let output = Command::new("ps")
+            .args(["-eo", "pid,comm,%cpu,%mem"])
+            .output()
+            .await
+            .map_err(|e| e.to_string())?;
+
+        let output_str = String::from_utf8_lossy(&output.stdout);
+        let processes = parse_ps(&output_str);
+        Ok(processes)
+    }
+}
+
+#[tauri::command]
+async fn kill_process(pid: u32) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        Command::new("taskkill")
+            .args(["/PID", &pid.to_string(), "/F"])
+            .output()
+            .await
+            .map_err(|e| e.to_string())?;
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        Command::new("kill")
+            .args(["-9", &pid.to_string()])
+            .output()
+            .await
+            .map_err(|e| e.to_string())?;
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        Command::new("kill")
+            .args(["-9", &pid.to_string()])
+            .output()
+            .await
+            .map_err(|e| e.to_string())?;
+    }
+
+    Ok(())
+}
+```
+
+### 生产部署
+
+#### 构建优化
+```toml
+# Cargo.toml
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+opt-level = "z"
+```
+
+#### 自动更新
+```rust
+use tauri_plugin_updater::UpdaterPlugin;
+
+#[tauri::command]
+async fn check_update(app: tauri::AppHandle) -> Result<(), String> {
+    let updater = app.updater().unwrap();
+
+    match updater.check().await {
+        Ok(update) => {
+            if update.is_update_available() {
+                update.download_and_install().await
+                    .map_err(|e| e.to_string())?;
+            }
+            Ok(())
+        }
+        Err(e) => Err(e.to_string()),
+    }
+}
+```
+
+#### CI/CD
+```yaml
+# .github/workflows/build.yml
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build
+      run: npm run tauri:build
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: tauri-${{ matrix.os }}
+        path: src-tauri/target/release/bundle/
+
+    - name: Create Release
+      if: matrix.os == 'ubuntu-latest'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: src-tauri/target/release/bundle/**/*
+```
+
+### 推荐资源
+- [Tauri 官方示例](https://github.com/tauri-apps/tauri/tree/dev/examples)
+- [Tauri React Demo](https://github.com/tauri-apps/tauri-react-demo)
+- [Tauri Vue Demo](https://github.com/tauri-apps/tauri-vue-demo)
+
+---
+
+## 阶段 5: 专家级 (持续)
+
+### 目标
+- ✅ 架构设计能力
+- ✅ 性能调优专家
+- ✅ 开源贡献
+- ✅ 社区建设
+- ✅ 技术分享
+
+### 学习内容
+
+#### 5.1 架构设计
+- 设计可扩展的插件系统
+- 实现微服务架构
+- 设计事件驱动系统
+- 优化数据流架构
+
+#### 5.2 性能调优
+- 内存泄漏检测
+- CPU 性能分析
+- I/O 优化
+- 网络优化
+
+#### 5.3 开源贡献
+- 阅读 Tauri 源码
+- 提交 PR
+- 参与代码审查
+- 贡献文档
+
+#### 5.4 社区建设
+- 组织线上活动
+- 撰写技术博客
+- 制作教程视频
+- 参与技术会议
+
+#### 5.5 技术分享
+- 撰写技术文章
+- 制作教学视频
+- 开源项目维护
+- 技术演讲
+
+### 实践项目
+- **Tauri 插件开发** - 开发自定义插件
+- **Tauri 框架扩展** - 扩展 Tauri 功能
+- **开源项目贡献** - 贡献 Tauri 生态
+- **技术社区建设** - 组织技术活动
+
+### 推荐资源
+- [Tauri 源码](https://github.com/tauri-apps/tauri)
+- [Rust 源码](https://github.com/rust-lang/rust)
+- [开源贡献指南](https://github.com/firstcontributions/first-contributions)
+
+---
+
+## 学习资源
+
+### 官方资源
+- [Tauri 官网](https://tauri.app/)
+- [Tauri 文档](https://tauri.app/v2/)
+- [Tauri API 参考](https://tauri.app/v2/api/)
+- [Tauri 插件](https://tauri.app/plugin/)
+
+### 社区资源
+- [Tauri Discord](https://discord.gg/tauri)
+- [Tauri 论坛](https://github.com/tauri-apps/tauri/discussions)
+- [Awesome Tauri](https://github.com/tauri-apps/awesome-tauri)
+- [Tauri Reddit](https://www.reddit.com/r/TauriApp/)
+
+### 学习平台
+- [Tauri 官方教程](https://tauri.app/v2/guides/)
+- [Tauri YouTube](https://www.youtube.com/@TauriApp)
+- [Tauri Blog](https://tauri.app/blog)
+- [Tauri 社区](https://community.tauri.app/)
+
+### 工具链
+- [create-tauri-app](https://github.com/tauri-apps/create-tauri-app)
+- [Tauri CLI](https://github.com/tauri-apps/tauri-cli)
+- [Tauri Action](https://github.com/tauri-apps/tauri-action)
+- [Tauri Updater](https://github.com/tauri-apps/tauri-updater)
+
+---
+
+## 时间规划
+
+### 1个月计划 (入门)
+```
+第 1 周: 基础语法
+  - 安装 Rust 和 Node.js
+  - 创建第一个 Tauri 应用
+  - 理解项目结构
+  - 项目: Hello Tauri
+
+第 2 周: 核心概念
+  - IPC 通信
+  - 窗口管理
+  - 菜单系统
+  - 项目: 文件浏览器
+
+第 3 周: 插件系统
+  - 使用官方插件
+  - 状态管理
+  - 文件操作
+  - 项目: 系统监控器
+
+第 4 周: 复习和实践
+  - 复习所有概念
+  - 完成综合项目
+  - 参与社区讨论
+```
+
+### 2个月计划 (中级)
+```
+第 1-2 月: 高级特性
+  - 异步编程
+  - 并发处理
+  - 性能优化
+  - 安全加固
+  - 自定义插件
+  - 项目: 实时聊天应用
+```
+
+### 3个月计划 (高级)
+```
+第 1-3 月: 实战项目
+  - 完整应用开发
+  - 生产部署
+  - 自动更新
+  - 多平台支持
+  - 项目: 数据可视化仪表盘
+```
+
+### 6个月计划 (专家)
+```
+第 1-6 月: 专家级
+  - 架构设计
+  - 性能调优
+  - 开源贡献
+  - 社区建设
+  - 项目: Tauri 插件开发
+```
+
+### 1年计划 (大师)
+```
+持续学习:
+  - 深入研究 Tauri 源码
+  - 贡献核心功能
+  - 技术分享
+  - 社区领导
+  - 项目: 框架扩展
+```
+
+---
+
+## 学习建议
+
+### 1. 循序渐进
+- 不要跳过基础概念
+- 每个阶段都要动手实践
+- 理解后再进入下一个阶段
+
+### 2. 多写代码
+- 每天至少写 1 小时代码
+- 从简单项目开始
+- 逐步增加复杂度
+
+### 3. 阅读源码
+- 阅读 Tauri 官方示例
+- 学习优秀开源项目
+- 理解设计模式
+
+### 4. 参与社区
+- 加入 Discord/Reddit
+- 参与讨论
+- 帮助他人解决问题
+
+### 5. 持续学习
+- Tauri 在快速发展
+- 关注新特性
+- 学习新的插件
+
+### 6. 项目驱动
+- 每个阶段都要有项目
+- 项目要实用
+- 逐步增加难度
+
+---
+
+## 常见问题
+
+### Q: Tauri 学习曲线陡峭吗？
+**A:** 相对于 Electron 来说，Tauri 需要学习 Rust，但一旦掌握，开发效率很高。
+
+### Q: 需要 Rust 背景吗？
+**A:** 不需要，但了解 Rust 基础会很有帮助。建议先学习 Rust 基础语法。
+
+### Q: Tauri 适合什么场景？
+**A:** 桌面应用、系统工具、数据可视化、开发工具等。
+
+### Q: 如何保持学习动力？
+**A:**
+- 设置小目标
+- 参与开源项目
+- 构建自己感兴趣的项目
+- 加入学习小组
+
+---
+
+## 总结
+
+### 学习路径
+1. **基础入门** (1-2周) - 安装、创建项目、基础语法
+2. **核心概念** (2-3周) - IPC、窗口、菜单、插件、状态
+3. **高级特性** (2-3周) - 异步、并发、性能、安全、自定义插件
+4. **实战项目** (3-4周) - 完整应用开发、生产部署
+5. **专家级** (持续) - 架构设计、性能调优、开源贡献
+
+### 核心概念
+- ✅ IPC 通信机制
+- ✅ 窗口和菜单管理
+- ✅ 插件系统
+- ✅ 状态管理
+- ✅ 异步编程
+- ✅ 性能优化
+- ✅ 安全加固
+
+### 最佳实践
+- ✅ 循序渐进学习
+- ✅ 多写代码实践
+- ✅ 阅读优秀源码
+- ✅ 参与社区讨论
+- ✅ 持续学习更新
+
+### 资源推荐
+- [Tauri 官网](https://tauri.app/)
+- [Tauri 文档](https://tauri.app/v2/)
+- [Tauri Discord](https://discord.gg/tauri)
+- [Awesome Tauri](https://github.com/tauri-apps/awesome-tauri)
+
+---
+
+**记住：Tauri 是一门需要实践的语言。多写代码，多思考，多交流！** 🚀🦀
+
+**祝你学习愉快，早日成为 Tauri 专家！** 🎉
+
+---
+
+**文档版本**: 1.0
+**最后更新**: 2026-01-26
+**学习周期**: 1-6个月
+**实践项目**: 10+ 个
+**最佳实践**: 20+ 条

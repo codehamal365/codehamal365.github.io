@@ -1,0 +1,1351 @@
+---
+title: Rust 入门与高级指南
+categories:
+  - Rust
+tags:
+  - Rust
+  - 入门
+  - 高级
+  - 指南
+---
+
+# Rust 入门与高级指南
+
+> 从零基础到精通的 Rust 学习路线图
+
+---
+
+## 📚 目录
+
+- [Rust 简介](#rust-简介)
+- [基础语法](#基础语法)
+- [所有权系统](#所有权系统)
+- [错误处理](#错误处理)
+- [并发编程](#并发编程)
+- [高级特性](#高级特性)
+- [最佳实践](#最佳实践)
+- [性能优化](#性能优化)
+- [实战项目](#实战项目)
+
+---
+
+## Rust 简介
+
+### 什么是 Rust？
+
+Rust 是一门系统编程语言，由 Mozilla 开发，具有以下特点：
+
+- **内存安全**：零成本抽象，无需垃圾回收
+- **并发安全**：所有权系统防止数据竞争
+- **高性能**：接近 C/C++ 的性能
+- **开发者友好**：优秀的编译器错误提示
+
+### 为什么选择 Rust？
+
+1. **安全性**：编译时防止常见错误
+2. **性能**：无运行时开销
+3. **并发**：Fearless concurrency
+4. **现代特性**：模式匹配、泛型、trait 等
+
+### 安装 Rust
+
+```bash
+# 使用 rustup 安装
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# 验证安装
+rustc --version
+cargo --version
+
+# 更新 Rust
+rustup update
+```
+
+### Hello World
+
+```rust
+fn main() {
+    println!("Hello, Rust!");
+}
+```
+
+运行：
+```bash
+rustc main.rs && ./main
+# 或使用 cargo
+cargo run
+```
+
+---
+
+## 基础语法
+
+### 变量与可变性
+
+```rust
+fn main() {
+    // 不可变变量
+    let x = 5;
+    println!("x = {}", x);
+
+    // 可变变量
+    let mut y = 10;
+    println!("y = {}", y);
+    y = 20;
+    println!("y = {}", y);
+
+    // 常量
+    const MAX_POINTS: u32 = 100_000;
+    println!("MAX_POINTS = {}", MAX_POINTS);
+}
+```
+
+### 数据类型
+
+#### 标量类型
+
+```rust
+fn main() {
+    // 整数类型
+    let a: i8 = -128;
+    let b: u8 = 255;
+    let c: i32 = 2_147_483_647;
+    let d: u64 = 18_446_744_073_709_551_615;
+
+    // 浮点数类型
+    let e: f64 = 3.141592653589793;
+    let f: f32 = 2.71828;
+
+    // 布尔类型
+    let g: bool = true;
+    let h: bool = false;
+
+    // 字符类型
+    let i: char = 'A';
+    let j: char = '中';
+    let k: char = '🦀';
+}
+```
+
+#### 复合类型
+
+```rust
+fn main() {
+    // 元组
+    let tup: (i32, f64, u8) = (500, 6.4, 1);
+    let (x, y, z) = tup;
+    println!("x={}, y={}, z={}", x, y, z);
+
+    // 数组
+    let arr: [i32; 5] = [1, 2, 3, 4, 5];
+    println!("arr[0] = {}", arr[0]);
+
+    // 字符串
+    let s: &str = "Hello, Rust!";
+    println!("{}", s);
+}
+```
+
+### 函数
+
+```rust
+// 基本函数
+fn add(a: i32, b: i32) -> i32 {
+    a + b  // 无需 return，表达式自动返回
+}
+
+// 表达式 vs 语句
+fn main() {
+    let x = 5;
+    let y = {
+        let temp = 3;
+        temp + 2  // 表达式，返回值
+    };
+    println!("y = {}", y);
+
+    let result = add(2, 3);
+    println!("2 + 3 = {}", result);
+}
+```
+
+### 控制流
+
+#### if 表达式
+
+```rust
+fn main() {
+    let number = 6;
+
+    if number % 4 == 0 {
+        println!("number 能被 4 整除");
+    } else if number % 3 == 0 {
+        println!("number 能被 3 整除");
+    } else {
+        println!("number 不能被 4 或 3 整除");
+    }
+
+    // if 是表达式
+    let condition = true;
+    let value = if condition { 5 } else { 6 };
+    println!("value = {}", value);
+}
+```
+
+#### 循环
+
+```rust
+fn main() {
+    // loop 循环
+    let mut counter = 0;
+    let result = loop {
+        counter += 1;
+        if counter == 10 {
+            break counter * 2;
+        }
+    };
+    println!("result = {}", result);
+
+    // while 循环
+    let mut number = 3;
+    while number != 0 {
+        println!("{}!", number);
+        number -= 1;
+    }
+    println!("LIFTOFF!!!");
+
+    // for 循环
+    let a = [10, 20, 30, 40, 50];
+    for element in a {
+        println!("the value is: {}", element);
+    }
+
+    // 范围循环
+    for number in 1..4 {
+        println!("{}", number);
+    }
+}
+```
+
+### 模式匹配
+
+```rust
+fn main() {
+    // match 表达式
+    let dice_roll = 9;
+    match dice_roll {
+        1 => println!("Snake eyes!"),
+        2 => println!("Two!"),
+        3 => println!("Three!"),
+        4 => println!("Four!"),
+        5 => println!("Five!"),
+        6 => println!("Six!"),
+        _ => println!("Other number"),
+    }
+
+    // 解构元组
+    let point = (3, 5);
+    match point {
+        (0, 0) => println!("Origin point"),
+        (x, 0) => println!("On x-axis at {}", x),
+        (0, y) => println!("On y-axis at {}", y),
+        (x, y) => println!("At ({}, {})", x, y),
+    }
+}
+```
+
+### 结构体
+
+```rust
+// 定义结构体
+struct User {
+    username: String,
+    email: String,
+    sign_in_count: u64,
+    active: bool,
+}
+
+// 元组结构体
+struct Color(i32, i32, i32);
+struct Point(i32, i32, i32);
+
+// 单元结构体
+struct AlwaysEqual;
+
+fn main() {
+    // 创建实例
+    let mut user1 = User {
+        username: String::from("someusername123"),
+        email: String::from("someone@example.com"),
+        sign_in_count: 1,
+        active: true,
+    };
+
+    user1.email = String::from("anotheremail@example.com");
+
+    // 元组结构体
+    let black = Color(0, 0, 0);
+    let origin = Point(0, 0, 0);
+
+    // 单元结构体
+    let subject = AlwaysEqual;
+}
+```
+
+### 枚举
+
+```rust
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+
+impl Message {
+    fn call(&self) {
+        match self {
+            Message::Quit => println!("Quit"),
+            Message::Move { x, y } => println!("Move to ({}, {})", x, y),
+            Message::Write(text) => println!("Text message: {}", text),
+            Message::ChangeColor(r, g, b) => println!("Change color to ({}, {}, {})", r, g, b),
+        }
+    }
+}
+
+fn main() {
+    let m = Message::Write(String::from("hello"));
+    m.call();
+
+    let m2 = Message::Move { x: 10, y: 20 };
+    m2.call();
+}
+```
+
+### Option 和 Result
+
+```rust
+// Option<T> - 可能有值的类型
+fn main() {
+    let some_number: Option<i32> = Some(5);
+    let absent_number: Option<i32> = None;
+
+    // 处理 Option
+    match some_number {
+        Some(x) => println!("Got value: {}", x),
+        None => println!("No value"),
+    }
+
+    // 使用 if let 简化
+    if let Some(x) = some_number {
+        println!("Value is: {}", x);
+    }
+}
+
+// Result<T, E> - 可能出错的类型
+use std::fs::File;
+use std::io::ErrorKind;
+
+fn main() {
+    let f = File::open("hello.txt");
+
+    let f = match f {
+        Ok(file) => file,
+        Err(error) => match error.kind() {
+            ErrorKind::NotFound => {
+                match File::create("hello.txt") {
+                    Ok(fc) => fc,
+                    Err(e) => panic!("Problem creating file: {:?}", e),
+                }
+            }
+            other_error => {
+                panic!("Problem opening the file: {:?}", other_error);
+            }
+        },
+    };
+
+    // 使用 ? 操作符
+    fn read_file() -> Result<String, std::io::Error> {
+        let mut file = File::open("hello.txt")?;
+        let mut contents = String::new();
+        file.read_to_string(&mut contents)?;
+        Ok(contents)
+    }
+}
+```
+
+---
+
+## 所有权系统
+
+### 所有权规则
+
+1. Rust 中的每个值都有一个所有者
+2. 一次只能有一个所有者
+3. 当所有者离开作用域，值将被丢弃
+
+```rust
+fn main() {
+    // 字符串字面量 - 存储在栈上
+    let s1 = "hello";
+
+    // String 类型 - 存储在堆上
+    let mut s2 = String::from("hello");
+    s2.push_str(", world!");
+    println!("{}", s2);
+
+    // 所有权转移
+    let s3 = String::from("original");
+    let s4 = s3;  // s3 不再有效
+    // println!("{}", s3);  // 错误！s3 已经移动
+
+    println!("{}", s4);  // 正确，s4 拥有值
+}
+```
+
+### 借用与引用
+
+```rust
+fn main() {
+    let s1 = String::from("hello");
+
+    // 不可变引用
+    let len = calculate_length(&s1);
+    println!("The length of '{}' is {}.", s1, len);
+
+    // 可变引用
+    let mut s2 = String::from("hello");
+    change(&mut s2);
+    println!("{}", s2);
+
+    // 同一作用域内只能有一个可变引用
+    let mut s = String::from("hello");
+    let r1 = &mut s;
+    // let r2 = &mut s;  // 错误！不能同时有多个可变引用
+    println!("{}", r1);
+}
+
+fn calculate_length(s: &String) -> usize {
+    s.len()
+}
+
+fn change(some_string: &mut String) {
+    some_string.push_str(", world");
+}
+```
+
+### 生命周期
+
+```rust
+// 显式生命周期注解
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+// 结构体中的生命周期
+struct ImportantExcerpt<'a> {
+    part: &'a str,
+}
+
+impl<'a> ImportantExcerpt<'a> {
+    fn level(&self) -> i32 {
+        3
+    }
+
+    fn announce_and_return_part(&self, announcement: &str) -> &str {
+        println!("Attention please: {}", announcement);
+        self.part
+    }
+}
+
+fn main() {
+    let novel = String::from("Call me Ishmael. Some years ago...");
+    let first_sentence = novel.split('.').next().expect("Could not find a '.'");
+    let i = ImportantExcerpt {
+        part: first_sentence,
+    };
+
+    let s = longest("hello", "world");
+    println!("Longest: {}", s);
+}
+```
+
+---
+
+## 错误处理
+
+### panic! vs Result
+
+```rust
+use std::fs::File;
+use std::io::{self, Read};
+
+// panic! - 不可恢复错误
+fn main() {
+    // 简单 panic
+    panic!("crash and burn");
+
+    // 带信息的 panic
+    let v = vec![1, 2, 3];
+    // v[99];  // 会 panic
+}
+
+// Result - 可恢复错误
+fn read_file() -> Result<String, io::Error> {
+    let mut file = File::open("hello.txt")?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+    Ok(contents)
+}
+
+fn main() {
+    match read_file() {
+        Ok(contents) => println!("File contents: {}", contents),
+        Err(e) => println!("Error reading file: {}", e),
+    }
+}
+```
+
+### 错误处理模式
+
+```rust
+use std::error::Error;
+use std::fs::File;
+use std::io::{self, Read};
+
+// 自定义错误类型
+#[derive(Debug)]
+struct AppError {
+    message: String,
+}
+
+impl AppError {
+    fn new(msg: &str) -> AppError {
+        AppError {
+            message: msg.to_string(),
+        }
+    }
+}
+
+impl std::fmt::Display for AppError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "AppError: {}", self.message)
+    }
+}
+
+impl Error for AppError {}
+
+// 使用 ? 操作符传播错误
+fn read_config() -> Result<String, AppError> {
+    let mut file = File::open("config.txt")
+        .map_err(|e| AppError::new(&format!("Failed to open config: {}", e)))?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)
+        .map_err(|e| AppError::new(&format!("Failed to read config: {}", e)))?;
+    Ok(contents)
+}
+
+// 错误处理组合器
+fn process_file() -> Result<(), AppError> {
+    let config = read_config()?;
+    println!("Config: {}", config);
+    Ok(())
+}
+
+fn main() {
+    if let Err(e) = process_file() {
+        eprintln!("Error: {}", e);
+    }
+}
+```
+
+---
+
+## 并发编程
+
+### 线程基础
+
+```rust
+use std::thread;
+use std::time::Duration;
+
+fn main() {
+    // 创建线程
+    let handle = thread::spawn(|| {
+        for i in 1..5 {
+            println!("Hi number {} from the spawned thread!", i);
+            thread::sleep(Duration::from_millis(1));
+        }
+    });
+
+    // 主线程继续执行
+    for i in 1..3 {
+        println!("Hi number {} from the main thread!", i);
+        thread::sleep(Duration::from_millis(1));
+    }
+
+    // 等待线程结束
+    handle.join().unwrap();
+}
+```
+
+### 消息传递
+
+```rust
+use std::sync::mpsc;
+use std::thread;
+
+fn main() {
+    // 创建通道
+    let (tx, rx) = mpsc::channel();
+
+    // 发送者线程
+    let tx1 = tx.clone();
+    thread::spawn(move || {
+        let vals = vec![
+            String::from("hi"),
+            String::from("from"),
+            String::from("the"),
+            String::from("thread"),
+        ];
+
+        for val in vals {
+            tx1.send(val).unwrap();
+            thread::sleep(Duration::from_millis(100));
+        }
+    });
+
+    // 接收者
+    for received in rx {
+        println!("Got: {}", received);
+    }
+}
+```
+
+### 共享状态
+
+```rust
+use std::sync::{Arc, Mutex};
+use std::thread;
+
+fn main() {
+    // 使用 Arc 和 Mutex 实现线程安全的共享状态
+    let counter = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let counter = Arc::clone(&counter);
+        let handle = thread::spawn(move || {
+            let mut num = counter.lock().unwrap();
+            *num += 1;
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    println!("Result: {}", *counter.lock().unwrap());
+}
+```
+
+### 异步编程
+
+```rust
+use std::future::Future;
+use std::pin::Pin;
+use std::task::{Context, Poll};
+use std::time::Duration;
+
+// 简单的异步函数
+async fn async_add(a: i32, b: i32) -> i32 {
+    a + b
+}
+
+// 模拟异步操作
+async fn fetch_data() -> String {
+    // 模拟网络请求
+    tokio::time::sleep(Duration::from_secs(1)).await;
+    String::from("Data from server")
+}
+
+// 使用 tokio 运行时
+#[tokio::main]
+async fn main() {
+    let result = async_add(2, 3).await;
+    println!("2 + 3 = {}", result);
+
+    let data = fetch_data().await;
+    println!("Fetched: {}", data);
+}
+```
+
+---
+
+## 高级特性
+
+### Traits
+
+```rust
+// 定义 trait
+trait Summary {
+    fn summarize(&self) -> String;
+}
+
+trait Display {
+    fn display(&self) -> String;
+}
+
+// 实现 trait
+struct NewsArticle {
+    headline: String,
+    location: String,
+    author: String,
+    content: String,
+}
+
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!("{}, by {} ({})", self.headline, self.author, self.location)
+    }
+}
+
+struct Tweet {
+    username: String,
+    content: String,
+    reply: bool,
+    retweet: bool,
+}
+
+impl Summary for Tweet {
+    fn summarize(&self) -> String {
+        format!("{}: {}", self.username, self.content)
+    }
+}
+
+// trait 作为参数
+fn notify(item: &impl Summary) {
+    println!("Breaking news! {}", item.summarize());
+}
+
+// trait bound 语法
+fn notify_with_bound<T: Summary>(item: &T) {
+    println!("Breaking news! {}", item.summarize());
+}
+
+// 多个 trait bound
+fn notify_multiple<T: Summary + Display>(item: &T) {
+    println!("{} - {}", item.summarize(), item.display());
+}
+
+// where 子句
+fn notify_where<T, U>(t: &T, u: &U)
+where
+    T: Summary,
+    U: Display,
+{
+    println!("{} - {}", t.summarize(), u.display());
+}
+
+fn main() {
+    let article = NewsArticle {
+        headline: String::from("Penguins win the Stanley Cup Championship!"),
+        location: String::from("Pittsburgh, PA, USA"),
+        author: String::from("Iceburgh"),
+        content: String::from("The Pittsburgh Penguins once again are the best hockey team in the NHL."),
+    };
+
+    let tweet = Tweet {
+        username: String::from("horse_ebooks"),
+        content: String::from("of course, as you probably already know, people"),
+        reply: false,
+        retweet: false,
+    };
+
+    notify(&article);
+    notify(&tweet);
+}
+```
+
+### 泛型
+
+```rust
+// 泛型函数
+fn largest<T: PartialOrd>(list: &[T]) -> &T {
+    let mut largest = &list[0];
+
+    for item in list {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+
+// 泛型结构体
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+// 泛型枚举
+enum Option<T> {
+    Some(T),
+    None,
+}
+
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+// 方法中的泛型
+impl<T> Point<T> {
+    fn x(&self) -> &T {
+        &self.x
+    }
+}
+
+// 为特定类型实现
+impl Point<f64> {
+    fn distance_from_origin(&self) -> f64 {
+        (self.x.powi(2) + self.y.powi(2)).sqrt()
+    }
+}
+
+fn main() {
+    let number_list = vec![34, 50, 25, 100, 65];
+    let result = largest(&number_list);
+    println!("The largest number is {}", result);
+
+    let char_list = vec!['y', 'm', 'a', 'q'];
+    let result = largest(&char_list);
+    println!("The largest char is {}", result);
+
+    let integer = Point { x: 5, y: 10 };
+    let float = Point { x: 1.0, y: 4.0 };
+
+    println!("integer.x = {}", integer.x());
+    println!("float.x = {}", float.x());
+}
+```
+
+### 宏
+
+```rust
+// 声明宏
+#[macro_export]
+macro_rules! vec {
+    ( $( $x:expr ),* ) => {
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push($x);
+            )*
+            temp_vec
+        }
+    };
+}
+
+// 使用宏
+fn main() {
+    let v = vec![1, 2, 3];
+    println!("v = {:?}", v);
+
+    // 过程宏（需要额外的 crate）
+    // #[derive(Debug)]
+    // struct MyStruct;
+}
+```
+
+### 生命周期高级用法
+
+```rust
+// 静态生命周期
+fn static_lifetime(s: &'static str) {
+    println!("{}", s);
+}
+
+// 生命周期省略规则
+fn first_word(s: &str) -> &str {
+    s.split_whitespace().next().unwrap()
+}
+
+// 结构体生命周期
+struct Context<'a> {
+    text: &'a str,
+}
+
+struct Parser<'a> {
+    context: &'a Context<'a>,
+}
+
+impl<'a> Parser<'a> {
+    fn parse(&self) -> Result<(), &'a str> {
+        Ok(())
+    }
+}
+
+fn main() {
+    static STATIC_STRING: &str = "I have a static lifetime";
+    static_lifetime(STATIC_STRING);
+
+    let word = first_word("hello world");
+    println!("First word: {}", word);
+}
+```
+
+---
+
+## 最佳实践
+
+### 代码组织
+
+```
+src/
+├── main.rs          # 二进制 crate 入口
+├── lib.rs           # 库 crate 入口
+├── mod1.rs          # 模块文件
+├── mod2/
+│   ├── mod.rs       # 子模块
+│   └── submod.rs
+└── utils/
+    ├── mod.rs
+    └── helpers.rs
+```
+
+### 模块系统
+
+```rust
+// src/lib.rs
+pub mod network {
+    pub mod http {
+        pub fn get(url: &str) -> String {
+            format!("GET {}", url)
+        }
+    }
+
+    pub mod tcp {
+        pub fn connect(addr: &str) {
+            println!("Connecting to {}", addr);
+        }
+    }
+}
+
+// 使用模块
+use network::http::get;
+use network::tcp::connect;
+
+pub fn run() {
+    let response = get("https://example.com");
+    println!("{}", response);
+
+    connect("127.0.0.1:8080");
+}
+```
+
+### 错误处理最佳实践
+
+```rust
+use std::error::Error;
+use std::fmt;
+
+// 自定义错误类型
+#[derive(Debug)]
+enum AppError {
+    IoError(std::io::Error),
+    ParseError(String),
+    ConfigError(String),
+}
+
+impl fmt::Display for AppError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            AppError::IoError(e) => write!(f, "IO error: {}", e),
+            AppError::ParseError(e) => write!(f, "Parse error: {}", e),
+            AppError::ConfigError(e) => write!(f, "Config error: {}", e),
+        }
+    }
+}
+
+impl Error for AppError {}
+
+impl From<std::io::Error> for AppError {
+    fn from(error: std::io::Error) -> Self {
+        AppError::IoError(error)
+    }
+}
+
+// 使用 ? 操作符传播错误
+fn read_config() -> Result<String, AppError> {
+    let content = std::fs::read_to_string("config.txt")?;
+    Ok(content)
+}
+
+fn main() -> Result<(), AppError> {
+    let config = read_config()?;
+    println!("Config: {}", config);
+    Ok(())
+}
+```
+
+### 测试
+
+```rust
+// 单元测试
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_add() {
+        assert_eq!(add(2, 3), 5);
+    }
+
+    #[test]
+    fn test_largest() {
+        let number_list = vec![34, 50, 25, 100, 65];
+        assert_eq!(*largest(&number_list), 100);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_panic() {
+        panic!("This test should panic");
+    }
+
+    #[test]
+    fn test_result() -> Result<(), String> {
+        if 2 + 2 == 4 {
+            Ok(())
+        } else {
+            Err(String::from("Math is broken"))
+        }
+    }
+}
+
+// 集成测试
+// tests/integration_test.rs
+use my_crate::add;
+
+#[test]
+fn test_add_integration() {
+    assert_eq!(add(2, 3), 5);
+}
+```
+
+### 文档注释
+
+```rust
+/// Adds two to the argument.
+///
+/// # Examples
+///
+/// ```
+/// let result = add_two(5);
+/// assert_eq!(7, result);
+/// ```
+pub fn add_two(a: i32) -> i32 {
+    a + 2
+}
+
+/// # Panics
+///
+/// Panics if the second argument is zero.
+pub fn divide(a: i32, b: i32) -> i32 {
+    if b == 0 {
+        panic!("Division by zero");
+    }
+    a / b
+}
+```
+
+---
+
+## 性能优化
+
+### 零成本抽象
+
+```rust
+// 使用迭代器而不是循环
+fn sum_squares(numbers: &[i32]) -> i32 {
+    numbers.iter().map(|x| x * x).sum()
+}
+
+// 使用 &str 而不是 String
+fn process_text(text: &str) -> String {
+    text.to_uppercase()
+}
+
+// 使用 Cow (Clone-on-Write) 避免不必要的克隆
+use std::borrow::Cow;
+
+fn process_or_keep<'a>(input: &'a str, uppercase: bool) -> Cow<'a, str> {
+    if uppercase {
+        Cow::Owned(input.to_uppercase())
+    } else {
+        Cow::Borrowed(input)
+    }
+}
+```
+
+### 内存布局优化
+
+```rust
+// 使用 repr(C) 保证内存布局
+#[repr(C)]
+struct Point {
+    x: f64,
+    y: f64,
+}
+
+// 使用 repr(packed) 减少填充
+#[repr(packed)]
+struct PackedPoint {
+    x: f64,
+    y: f64,
+}
+
+// 使用 Box 避免栈溢出
+fn create_large_vec() -> Box<Vec<i32>> {
+    Box::new(vec![0; 1_000_000])
+}
+```
+
+### 并发优化
+
+```rust
+use std::sync::Arc;
+use std::thread;
+
+// 使用 Rayon 进行并行计算
+use rayon::prelude::*;
+
+fn parallel_sum(numbers: &[i32]) -> i32 {
+    numbers.par_iter().sum()
+}
+
+// 使用 crossbeam 进行无锁并发
+use crossbeam::channel;
+
+fn channel_example() {
+    let (sender, receiver) = channel::unbounded();
+
+    let handle = thread::spawn(move || {
+        for i in 0..10 {
+            sender.send(i).unwrap();
+        }
+    });
+
+    for received in receiver {
+        println!("Got: {}", received);
+    }
+
+    handle.join().unwrap();
+}
+```
+
+### 基准测试
+
+```rust
+// Cargo.toml
+// [dev-dependencies]
+// criterion = "0.4"
+
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
+
+fn fibonacci(n: u64) -> u64 {
+    match n {
+        0 => 1,
+        1 => 1,
+        n => fibonacci(n - 1) + fibonacci(n - 2),
+    }
+}
+
+fn criterion_benchmark(c: &mut Criterion) {
+    c.bench_function("fib 20", |b| b.iter(|| fibonacci(black_box(20))));
+}
+
+criterion_group!(benches, criterion_benchmark);
+criterion_main!(benches);
+```
+
+---
+
+## 实战项目
+
+### 项目 1: 命令行工具
+
+```rust
+// Cargo.toml
+// [dependencies]
+// clap = { version = "4.0", features = ["derive"] }
+
+use clap::Parser;
+
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// Input file
+    #[arg(short, long)]
+    input: String,
+
+    /// Output file
+    #[arg(short, long)]
+    output: Option<String>,
+
+    /// Verbose mode
+    #[arg(short, long)]
+    verbose: bool,
+}
+
+fn main() {
+    let args = Args::parse();
+
+    println!("Input: {}", args.input);
+    if let Some(output) = args.output {
+        println!("Output: {}", output);
+    }
+
+    if args.verbose {
+        println!("Verbose mode enabled");
+    }
+}
+```
+
+### 项目 2: Web 服务器
+
+```rust
+// Cargo.toml
+// [dependencies]
+// tokio = { version = "1.0", features = ["full"] }
+// hyper = { version = "0.14", features = ["full"] }
+
+use hyper::{Body, Request, Response, Server};
+use hyper::service::{make_service_fn, service_fn};
+use std::convert::Infallible;
+use std::net::SocketAddr;
+
+async fn handle_request(_req: Request<Body>) -> Result<Response<Body>, Infallible> {
+    Ok(Response::new(Body::from("Hello, World!")))
+}
+
+#[tokio::main]
+async fn main() {
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+
+    let make_svc = make_service_fn(|_conn| async {
+        Ok::<_, Infallible>(service_fn(handle_request))
+    });
+
+    let server = Server::bind(&addr).serve(make_svc);
+
+    println!("Listening on http://{}", addr);
+
+    if let Err(e) = server.await {
+        eprintln!("server error: {}", e);
+    }
+}
+```
+
+### 项目 3: 数据库操作
+
+```rust
+// Cargo.toml
+// [dependencies]
+// sqlx = { version = "0.6", features = ["postgres", "runtime-tokio-native-tls"] }
+// tokio = { version = "1.0", features = ["full"] }
+
+use sqlx::postgres::PgPoolOptions;
+
+#[derive(Debug, sqlx::FromRow)]
+struct User {
+    id: i32,
+    username: String,
+    email: String,
+}
+
+#[tokio::main]
+async fn main() -> Result<(), sqlx::Error> {
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect("postgres://user:password@localhost/dbname")
+        .await?;
+
+    let users: Vec<User> = sqlx::query_as::<_, User>("SELECT id, username, email FROM users")
+        .fetch_all(&pool)
+        .await?;
+
+    for user in users {
+        println!("{:?}", user);
+    }
+
+    Ok(())
+}
+```
+
+---
+
+## 学习资源
+
+### 官方资源
+- [Rust 官方文档](https://doc.rust-lang.org/)
+- [Rust by Example](https://doc.rust-lang.org/rust-by-example/)
+- [The Rust Programming Language](https://doc.rust-lang.org/book/)
+
+### 社区资源
+- [Rustlings](https://github.com/rust-lang/rustlings) - 互动练习
+- [Exercism](https://exercism.org/tracks/rust) - 编程练习
+- [Rust Cookbook](https://rust-lang-nursery.github.io/rust-cookbook/) - 常见任务解决方案
+
+### 推荐书籍
+- 《Rust 程序设计语言》（官方书籍）
+- 《Rust 权威指南》
+- 《Rust 编程》
+
+### 工具
+- **rust-analyzer** - IDE 支持
+- **clippy** - 代码检查工具
+- **rustfmt** - 代码格式化工具
+- **cargo** - 包管理工具
+
+---
+
+## 总结
+
+Rust 是一门强大而现代的系统编程语言，具有以下特点：
+
+### 核心优势
+1. **内存安全** - 编译时防止内存错误
+2. **并发安全** - 零成本抽象的并发编程
+3. **高性能** - 接近 C/C++ 的性能
+4. **开发者友好** - 优秀的错误提示和工具链
+
+### 学习路径
+1. **基础语法** - 变量、函数、控制流
+2. **所有权系统** - 所有权、借用、生命周期
+3. **错误处理** - Result、panic、自定义错误
+4. **并发编程** - 线程、消息传递、共享状态
+5. **高级特性** - Traits、泛型、宏
+6. **最佳实践** - 代码组织、测试、文档
+
+### 实践建议
+- 从 Rustlings 开始练习
+- 阅读官方书籍
+- 参与开源项目
+- 构建自己的项目
+
+### 持续学习
+- 关注 Rust 社区动态
+- 学习新的 crate 和工具
+- 参与 Rust 会议和讨论
+- 贡献开源项目
+
+---
+
+**祝你 Rust 学习之旅愉快！** 🦀

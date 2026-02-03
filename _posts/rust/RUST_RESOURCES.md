@@ -1,0 +1,667 @@
+---
+title: Rust 学习资源索引
+categories:
+  - Rust
+tags:
+  - Rust
+  - 资源
+  - 索引
+  - 学习
+---
+
+# Rust 学习资源索引
+
+> 完整的 Rust 学习资源汇总
+
+---
+
+## 📋 目录
+
+- [官方资源](#官方资源)
+- [在线教程](#在线教程)
+- [书籍推荐](#书籍推荐)
+- [视频教程](#视频教程)
+- [在线课程](#在线课程)
+- [工具链](#工具链)
+- [社区](#社区)
+- [博客和文章](#博客和文章)
+- [开源项目](#开源项目)
+- [学习路径](#学习路径)
+
+---
+
+## 官方资源
+
+### 1. 官方文档
+
+| 资源 | 链接 | 说明 |
+|------|------|------|
+| **The Rust Programming Language** | https://doc.rust-lang.org/book/ | 官方书籍，入门必读 |
+| **Rust by Example** | https://doc.rust-lang.org/rust-by-example/ | 实例驱动，快速上手 |
+| **Rustlings** | https://github.com/rust-lang/rustlings | 互动练习，巩固知识 |
+| **Rust Cookbook** | https://rust-lang-nursery.github.io/rust-cookbook/ | 常见任务解决方案 |
+| **The Rustonomicon** | https://doc.rust-lang.org/nomicon/ | 高级主题，unsafe Rust |
+| **Rust API 文档** | https://doc.rust-lang.org/std/ | 标准库文档 |
+| **Cargo 手册** | https://doc.rust-lang.org/cargo/ | Cargo 使用指南 |
+| **Rust 编译器错误索引** | https://doc.rust-lang.org/error-index.html | 错误代码查询 |
+
+### 2. 官方工具
+
+| 工具 | 链接 | 说明 |
+|------|------|------|
+| **rustup** | https://rustup.rs/ | Rust 安装工具 |
+| **Cargo** | https://doc.rust-lang.org/cargo/ | 包管理器和构建工具 |
+| **rustfmt** | https://github.com/rust-lang/rustfmt | 代码格式化工具 |
+| **clippy** | https://github.com/rust-lang/rust-clippy | 代码检查工具 |
+| **rust-analyzer** | https://rust-analyzer.github.io/ | IDE 语言服务器 |
+
+---
+
+## 在线教程
+
+### 交互式学习
+
+| 平台 | 链接 | 特点 |
+|------|------|------|
+| **Rustlings** | https://github.com/rust-lang/rustlings | 官方互动练习 |
+| **Exercism** | https://exercism.org/tracks/rust | 编程练习平台 |
+| **Codewars** | https://www.codewars.com/?language=rust | 竞技编程 |
+| **LeetCode** | https://leetcode.com/tag/rust/ | 算法练习 |
+| **HackerRank** | https://www.hackerrank.com/domains/tutorials/10-days-of-rust | 10天 Rust 教程 |
+
+### 在线教程网站
+
+| 网站 | 链接 | 特点 |
+|------|------|------|
+| **Learn Rust** | https://learnrust.org/ | 结构化学习路径 |
+| **Rust School** | https://rust-lang.github.io/rustlings/ | 日本 Rust 社区 |
+| **Rust 101** | https://rust-lang.github.io/rustlings/ | 基础教程 |
+| **Rust by Example 中文** | https://rustwiki.org/zh-CN/rust-by-example/ | 中文版 |
+| **Rust 程序设计语言 中文** | https://rustwiki.org/zh-CN/book/ | 中文版官方书籍 |
+
+---
+
+## 书籍推荐
+
+### 入门书籍
+
+| 书名 | 作者 | 链接 | 说明 |
+|------|------|------|------|
+| **The Rust Programming Language** | Steve Klabnik, Carol Nichols | https://doc.rust-lang.org/book/ | 官方书籍，免费 |
+| **Rust 程序设计语言** | Steve Klabnik, Carol Nichols | https://rustwiki.org/zh-CN/book/ | 中文版官方书籍 |
+| **Rust by Example** | Rust 社区 | https://doc.rust-lang.org/rust-by-example/ | 实例驱动 |
+| **Rustlings** | Rust 社区 | https://github.com/rust-lang/rustlings | 互动练习 |
+
+### 进阶书籍
+
+| 书名 | 作者 | 链接 | 说明 |
+|------|------|------|------|
+| **Rust 权威指南** | Steve Klabnik, Carol Nichols | https://nostarch.com/rust | 深入理解 Rust |
+| **Rust 编程** | Jim Blandy, Jason Orendorff | https://www.oreilly.com/library/view/programming-rust/9781491927274/ | 系统编程 |
+| **Rust 并发编程** | Carl Lerche 等 | https://github.com/rust-lang-nursery/futures-rs | 并发和异步 |
+| **Rust 性能优化** | Nicholas Matsakis 等 | https://doc.rust-lang.org/nomicon/ | 高级优化 |
+
+### 特定领域
+
+| 书名 | 作者 | 链接 | 说明 |
+|------|------|------|------|
+| **Rust Web 开发** | Blandy, Orendorff | https://www.oreilly.com/library/view/programming-rust/9781491927274/ | Web 开发 |
+| **Rust 嵌入式开发** | Rust Embedded Team | https://doc.rust-lang.org/embedded-book/ | 嵌入式系统 |
+| **Rust 游戏开发** | Rattler 等 | https://github.com/rust-unofficial/awesome-rust#games | 游戏开发 |
+| **Rust 区块链** | Rust Blockchain Team | https://github.com/rust-unofficial/awesome-rust#blockchain | 区块链 |
+
+---
+
+## 视频教程
+
+### YouTube 频道
+
+| 频道 | 链接 | 特点 |
+|------|------|------|
+| **Jon Gjengset** | https://www.youtube.com/c/JonGjengset | 高级主题，深入讲解 |
+| **Let's Get Rusty** | https://www.youtube.com/c/LetsGetRusty | 适合初学者 |
+| **Rust 官方频道** | https://www.youtube.com/c/RustProgrammingLanguage | 官方活动和教程 |
+| **The Rust Programming Language** | https://www.youtube.com/c/TheRustProgrammingLanguage | 教学视频 |
+| **Rust 语言中文社区** | https://www.youtube.com/c/Rust中文社区 | 中文教程 |
+
+### 推荐视频系列
+
+| 系列 | 链接 | 说明 |
+|------|------|------|
+| **Rust Crash Course** | https://www.youtube.com/watch?v=zF4dt909FIQ | 1小时快速入门 |
+| **Rust Tutorial** | https://www.youtube.com/playlist?list=PLJbE2Yu2zumDF6BX6_RdPisRVHgzV02NW | 完整教程 |
+| **Rust 编程** | https://www.youtube.com/playlist?list=PLJbE2Yu2zumDF6BX6_RdPisRVHgzV02NW | 中文系列 |
+| **Rust 语言入门** | https://www.youtube.com/playlist?list=PLJbE2Yu2zumDF6BX6_RdPisRVHgzV02NW | 基础概念 |
+
+---
+
+## 在线课程
+
+### 付费课程
+
+| 平台 | 课程 | 链接 | 价格 |
+|------|------|------|------|
+| **Udemy** | Rust Programming - The Complete Developer's Guide | https://www.udemy.com/course/rust-fundamentals/ | $10-20 |
+| **Pluralsight** | Rust Fundamentals | https://www.pluralsight.com/courses/rust-fundamentals | 订阅制 |
+| **Coursera** | The Rust Programming Language | https://www.coursera.org/learn/rust-programming | 订阅制 |
+| **Educative** | Rust for Beginners | https://www.educative.io/courses/rust-for-beginners | 订阅制 |
+| **LinkedIn Learning** | Learning Rust | https://www.linkedin.com/learning/learning-rust | 订阅制 |
+
+### 免费课程
+
+| 平台 | 课程 | 链接 | 说明 |
+|------|------|------|------|
+| **freeCodeCamp** | Rust Course | https://www.freecodecamp.org/news/learn-rust/ | 免费 |
+| **The Odin Project** | Rust Track | https://www.theodinproject.com/paths/full-stack-javascript/courses/rust | 免费 |
+| **Rustlings** | Interactive Exercises | https://github.com/rust-lang/rustlings | 免费 |
+| **Exercism** | Rust Track | https://exercism.org/tracks/rust | 免费 |
+
+---
+
+## 工具链
+
+### 开发工具
+
+| 工具 | 链接 | 说明 |
+|------|------|------|
+| **rustup** | https://rustup.rs/ | Rust 版本管理器 |
+| **Cargo** | https://doc.rust-lang.org/cargo/ | 包管理器和构建工具 |
+| **rustfmt** | https://github.com/rust-lang/rustfmt | 代码格式化 |
+| **clippy** | https://github.com/rust-lang/rust-clippy | 代码检查 |
+| **rust-analyzer** | https://rust-analyzer.github.io/ | IDE 语言服务器 |
+
+### IDE 支持
+
+| IDE | 插件 | 链接 |
+|------|------|------|
+| **VS Code** | rust-analyzer | https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer |
+| **VS Code** | CodeLLDB | https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb |
+| **VS Code** | Even Better TOML | https://marketplace.visualstudio.com/items?itemName=tamasfe.even-better-toml |
+| **IntelliJ** | Rust Plugin | https://plugins.jetbrains.com/plugin/8182-rust |
+| **Vim/Neovim** | rust.vim | https://github.com/rust-lang/rust.vim |
+| **Emacs** | rust-mode | https://github.com/rust-lang/rust-mode |
+
+### 性能分析工具
+
+| 工具 | 链接 | 说明 |
+|------|------|------|
+| **cargo-flamegraph** | https://github.com/flamegraph-rs/flamegraph | 火焰图分析 |
+| **cargo-bloat** | https://github.com/RazrFalcon/cargo-bloat | 二进制大小分析 |
+| **cargo-tarpaulin** | https://github.com/xd009642/tarpaulin | 代码覆盖率 |
+| **cargo-audit** | https://github.com/RustSec/cargo-audit | 安全漏洞检查 |
+| **cargo-deny** | https://github.com/EmbarkStudios/cargo-deny | 依赖检查 |
+
+---
+
+## 社区
+
+### 官方社区
+
+| 社区 | 链接 | 特点 |
+|------|------|------|
+| **Rust 官方论坛** | https://users.rust-lang.org/ | 官方论坛 |
+| **Rust Discord** | https://discord.gg/rust-lang | 实时聊天 |
+| **Rust Reddit** | https://www.reddit.com/r/rust/ | 社区讨论 |
+| **Rust Zulip** | https://rust-lang.zulipchat.com/ | 异步聊天 |
+| **Rust Blog** | https://blog.rust-lang.org/ | 官方博客 |
+
+### 中文社区
+
+| 社区 | 链接 | 特点 |
+|------|------|------|
+| **Rust 中文社区** | https://rustcc.cn/ | 中文论坛 |
+| **Rust 语言中文社区** | https://rustlang-cn.org/ | 中文文档 |
+| **Rust 中文 Telegram** | https://t.me/rustlangcn | Telegram 群组 |
+| **Rust 中文 Discord** | https://discord.gg/rustlangcn | Discord 中文频道 |
+| **Rust 中文 Reddit** | https://www.reddit.com/r/rustlangcn/ | Reddit 中文社区 |
+
+### 开源社区
+
+| 组织 | 链接 | 说明 |
+|------|------|------|
+| **Rust 官方** | https://github.com/rust-lang | 官方仓库 |
+| **Rust 社区** | https://github.com/rust-unofficial | 社区项目 |
+| **Tokio** | https://github.com/tokio-rs/tokio | 异步运行时 |
+| **Rust Embedded** | https://github.com/rust-embedded | 嵌入式开发 |
+| **Rust Web** | https://github.com/rust-web | Web 开发 |
+
+---
+
+## 博客和文章
+
+### 技术博客
+
+| 博客 | 链接 | 作者 |
+|------|------|------|
+| **Rust Blog** | https://blog.rust-lang.org/ | Rust 官方 |
+| **Without Boats** | https://without.boats/blog/ | Without Boats |
+| **The Rust Programming Language Blog** | https://blog.rust-lang.org/ | Rust 团队 |
+| **Rust Magazine** | https://rustmagazine.org/ | Rust 中文杂志 |
+| **Rust 中文社区博客** | https://rustcc.cn/blog | 中文社区 |
+
+### 文章推荐
+
+| 主题 | 链接 | 说明 |
+|------|------|------|
+| **Rust 所有权系统详解** | https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html | 官方文档 |
+| **Rust 并发编程指南** | https://doc.rust-lang.org/book/ch16-00-concurrency.html | 官方文档 |
+| **Rust 性能优化技巧** | https://github.com/nrc/rust-performance | 性能优化 |
+| **Rust 错误处理最佳实践** | https://doc.rust-lang.org/stable/rust-by-example/error.html | 错误处理 |
+| **Rust 宏使用指南** | https://doc.rust-lang.org/reference/macros.html | 宏系统 |
+
+---
+
+## 开源项目
+
+### 学习项目
+
+| 项目 | 链接 | 说明 |
+|------|------|------|
+| **Rustlings** | https://github.com/rust-lang/rustlings | 互动练习 |
+| **Exercism Rust Track** | https://exercism.org/tracks/rust | 编程练习 |
+| **Rust by Example** | https://github.com/rust-lang/rust-by-example | 实例教程 |
+| **Rust Cookbook** | https://github.com/rust-lang-nursery/rust-cookbook | 食谱 |
+
+### 实用项目
+
+| 项目 | 链接 | 说明 |
+|------|------|------|
+| **ripgrep** | https://github.com/BurntSushi/ripgrep | 高性能 grep |
+| **fd** | https://github.com/sharkdp/fd | 简单的 find 替代品 |
+| **bat** | https://github.com/sharkdp/bat | cat 的增强版 |
+| **exa** | https://github.com/ogham/exa | ls 的现代替代品 |
+| **alacritty** | https://github.com/alacritty/alacritty | GPU 加速终端 |
+
+### Web 开发
+
+| 项目 | 链接 | 说明 |
+|------|------|------|
+| **actix-web** | https://github.com/actix/actix-web | Web 框架 |
+| **rocket** | https://github.com/SergioBenitez/Rocket | Web 框架 |
+| **axum** | https://github.com/tokio-rs/axum | Web 框架 |
+| **warp** | https://github.com/seanmonstar/warp | Web 框架 |
+| **yew** | https://github.com/yewstack/yew | WebAssembly 前端 |
+
+### 系统编程
+
+| 项目 | 链接 | 说明 |
+|------|------|------|
+| **tokio** | https://github.com/tokio-rs/tokio | 异步运行时 |
+| **rayon** | https://github.com/rayon-rs/rayon | 并行计算 |
+| **crossbeam** | https://github.com/crossbeam-rs/crossbeam | 并发工具 |
+| **serde** | https://github.com/serde-rs/serde | 序列化框架 |
+| **nom** | https://github.com/Geal/nom | 解析器组合库 |
+
+### 嵌入式开发
+
+| 项目 | 链接 | 说明 |
+|------|------|------|
+| **embedded-hal** | https://github.com/rust-embedded/embedded-hal | 硬件抽象层 |
+| **cortex-m** | https://github.com/rust-embedded/cortex-m | Cortex-M 支持 |
+| **stm32-rs** | https://github.com/stm32-rs/stm32-rs | STM32 支持 |
+| **esp-rs** | https://github.com/esp-rs/esp-rs | ESP32 支持 |
+
+---
+
+## 学习路径
+
+### 1个月计划 (入门)
+
+#### 第 1 周: 基础语法
+- [ ] 安装 Rust (rustup)
+- [ ] Hello World
+- [ ] 变量和可变性
+- [ ] 数据类型
+- [ ] 函数
+- [ ] 控制流
+- [ ] 项目: 猜数字游戏
+
+**资源**:
+- [The Rust Book - 第 1-2 章](https://doc.rust-lang.org/book/ch01-00-introduction.html)
+- [Rust by Example - 基础](https://doc.rust-lang.org/rust-by-example/hello.html)
+- [Rustlings - 基础部分](https://github.com/rust-lang/rustlings)
+
+#### 第 2 周: 核心概念
+- [ ] 所有权系统
+- [ ] 借用和引用
+- [ ] 生命周期
+- [ ] 错误处理 (Option, Result)
+- [ ] 项目: 文件处理器
+
+**资源**:
+- [The Rust Book - 第 3-4 章](https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html)
+- [Rust by Example - 所有权](https://doc.rust-lang.org/rust-by-example/scope.html)
+- [Rustlings - 所有权部分](https://github.com/rust-lang/rustlings/tree/main/exercises/01_variables)
+
+#### 第 3 周: 高级语法
+- [ ] 结构体
+- [ ] 枚举
+- [ ] 模式匹配
+- [ ] 模块系统
+- [ ] 项目: 命令行工具
+
+**资源**:
+- [The Rust Book - 第 5-7 章](https://doc.rust-lang.org/book/ch05-00-structs.html)
+- [Rust by Example - 结构体](https://doc.rust-lang.org/rust-by-example/custom_types/structs.html)
+- [Rustlings - 结构体部分](https://github.com/rust-lang/rustlings/tree/main/exercises/05_structs)
+
+#### 第 4 周: 并发基础
+- [ ] 线程基础
+- [ ] 消息传递
+- [ ] 共享状态
+- [ ] 项目: 多线程工具
+
+**资源**:
+- [The Rust Book - 第 16 章](https://doc.rust-lang.org/book/ch16-00-concurrency.html)
+- [Rust by Example - 并发](https://doc.rust-lang.org/rust-by-example/concurrency.html)
+- [Rustlings - 并发部分](https://github.com/rust-lang/rustlings/tree/main/exercises/16_threads)
+
+### 2个月计划 (中级)
+
+#### 第 5-6 周: Traits 和泛型
+- [ ] Traits 基础
+- [ ] 泛型
+- [ ] 生命周期高级用法
+- [ ] 项目: 数据处理库
+
+**资源**:
+- [The Rust Book - 第 10 章](https://doc.rust-lang.org/book/ch10-00-generics.html)
+- [Rust by Example - Traits](https://doc.rust-lang.org/rust-by-example/traits.html)
+- [Rustlings - Traits 部分](https://github.com/rust-lang/rustlings/tree/main/exercises/10_generics)
+
+#### 第 7-8 周: 错误处理和测试
+- [ ] 错误处理最佳实践
+- [ ] 自定义错误类型
+- [ ] 单元测试
+- [ ] 集成测试
+- [ ] 项目: 完整应用
+
+**资源**:
+- [The Rust Book - 第 9 章](https://doc.rust-lang.org/book/ch09-00-error-handling.html)
+- [Rust by Example - 错误处理](https://doc.rust-lang.org/rust-by-example/error.html)
+- [Rustlings - 错误处理部分](https://github.com/rust-lang/rustlings/tree/main/exercises/09_error_handling)
+
+#### 第 9-10 周: 高级特性
+- [ ] 宏基础
+- [ ] 异步编程基础
+- [ ] 性能优化基础
+- [ ] 项目: Web 服务
+
+**资源**:
+- [The Rust Book - 第 19 章](https://doc.rust-lang.org/book/ch19-00-advanced-features.html)
+- [Rust by Example - 宏](https://doc.rust-lang.org/rust-by-example/macros.html)
+- [Async Book](https://rust-lang.github.io/async-book/)
+
+#### 第 11-12 周: 实战项目
+- [ ] 选择一个完整项目
+- [ ] 设计架构
+- [ ] 实现核心功能
+- [ ] 添加测试
+- [ ] 性能优化
+- [ ] 文档和部署
+
+**项目建议**:
+- 命令行工具 (类似 ripgrep)
+- Web API 服务
+- 数据库应用
+- 并发数据处理器
+
+### 3个月计划 (高级)
+
+#### 第 13-14 周: 高级并发
+- [ ] 高级并发模式
+- [ ] 无锁数据结构
+- [ ] 异步运行时
+- [ ] 项目: 高性能服务
+
+**资源**:
+- [Tokio 教程](https://tokio.rs/tokio/tutorial)
+- [Rust 并发编程](https://github.com/rust-lang-nursery/futures-rs)
+- [Crossbeam 文档](https://docs.rs/crossbeam/)
+
+#### 第 15-16 周: Unsafe Rust
+- [ ] Unsafe 基础
+- [ ] 裸指针
+- [ ] FFI
+- [ ] 内存布局
+- [ ] 项目: 系统工具
+
+**资源**:
+- [The Rustonomicon](https://doc.rust-lang.org/nomicon/)
+- [Unsafe Rust 指南](https://doc.rust-lang.org/nomicon/)
+
+#### 第 17-18 周: 性能优化
+- [ ] 性能分析工具
+- [ ] 内存优化
+- [ ] 编译优化
+- [ ] 项目: 性能关键应用
+
+**资源**:
+- [Rust 性能优化](https://github.com/nrc/rust-performance)
+- [Cargo 性能指南](https://doc.rust-lang.org/cargo/reference/profiles.html)
+
+#### 第 19-20 周: 生态系统
+- [ ] 常用 crates
+- [ ] 项目结构
+- [ ] 发布和维护
+- [ ] 开源贡献
+
+**资源**:
+- [Awesome Rust](https://github.com/rust-unofficial/awesome-rust)
+- [Crates.io](https://crates.io/)
+
+#### 第 21-24 周: 专家级项目
+- [ ] 大型项目开发
+- [ ] 架构设计
+- [ ] 团队协作
+- [ ] 性能调优
+- [ ] 生产部署
+
+**项目建议**:
+- 操作系统内核模块
+- 高性能数据库
+- 分布式系统
+- 游戏引擎
+
+---
+
+## 学习建议
+
+### 1. 循序渐进
+- 不要跳过基础概念
+- 每个概念都要动手实践
+- 理解后再进入下一个
+
+### 2. 多写代码
+- 每天至少写 1 小时 Rust 代码
+- 从简单项目开始
+- 逐步增加复杂度
+
+### 3. 阅读源码
+- 阅读优秀 Rust 项目
+- 学习代码风格和最佳实践
+- 理解设计模式
+
+### 4. 参与社区
+- 加入 Discord/Reddit
+- 参与讨论
+- 帮助他人解决问题
+
+### 5. 持续学习
+- Rust 语言在快速发展
+- 关注新特性
+- 学习新的 crates
+
+### 6. 项目驱动
+- 每个阶段都要有项目
+- 项目要实用
+- 逐步增加难度
+
+### 7. 记录学习
+- 写博客记录学习过程
+- 制作笔记
+- 分享经验
+
+### 8. 参与开源
+- 从修复小 bug 开始
+- 参与文档翻译
+- 贡献代码
+
+---
+
+## 常见问题
+
+### Q: Rust 学习曲线陡峭吗？
+**A:** 是的，但值得。所有权系统是最大的挑战，一旦掌握，其他概念会更容易。
+
+### Q: 需要 C/C++ 背景吗？
+**A:** 不需要。Rust 可以从零开始学习，但了解系统编程概念有帮助。
+
+### Q: 学习 Rust 需要多长时间？
+**A:** 基础 1-2 个月，中级 3-6 个月，专家需要持续学习。
+
+### Q: Rust 适合什么场景？
+**A:** 系统编程、Web 服务、命令行工具、嵌入式开发、游戏开发等。
+
+### Q: 如何保持学习动力？
+**A:**
+- 设置小目标
+- 参与开源项目
+- 构建自己感兴趣的项目
+- 加入学习小组
+
+---
+
+## 总结
+
+### 核心资源
+1. **官方书籍** - The Rust Programming Language
+2. **Rust by Example** - 实例驱动学习
+3. **Rustlings** - 互动练习
+4. **官方文档** - API 参考
+
+### 学习路径
+1. **基础语法** (1-2周)
+2. **核心概念** (2-3周)
+3. **高级特性** (2-3周)
+4. **实战项目** (3-4周)
+5. **专家级** (持续)
+
+### 关键概念
+- 所有权系统 (最重要)
+- 错误处理 (Result, Option)
+- Traits 和泛型 (代码复用)
+- 并发编程 (安全并发)
+
+### 最佳实践
+- 每天练习
+- 阅读优秀代码
+- 参与社区
+- 构建项目
+
+### 持续学习
+- 关注 Rust 发展
+- 学习新特性
+- 贡献开源
+- 分享知识
+
+---
+
+**记住：Rust 是一门需要实践的语言。多写代码，多思考，多交流！** 🦀
+
+**祝你学习愉快，早日成为 Rust 专家！** 🚀
+
+---
+
+## 附录: 快速参考
+
+### 常用命令
+```bash
+# 安装
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# 项目管理
+cargo new myapp
+cargo build
+cargo run
+cargo test
+cargo doc
+
+# 代码质量
+cargo fmt
+cargo clippy
+cargo check
+
+# 依赖管理
+cargo update
+cargo tree
+cargo outdated
+```
+
+### 常用 Crates
+```toml
+[dependencies]
+# Web
+actix-web = "4.0"
+rocket = "0.5"
+
+# 异步
+tokio = { version = "1.0", features = ["full"] }
+async-std = "1.0"
+
+# 序列化
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# 数据库
+sqlx = { version = "0.6", features = ["postgres", "runtime-tokio-native-tls"] }
+diesel = { version = "2.0", features = ["postgres"] }
+
+# HTTP
+reqwest = { version = "0.11", features = ["json"] }
+
+# 命令行
+clap = { version = "4.0", features = ["derive"] }
+
+# 随机数
+rand = "0.8"
+
+# 正则
+regex = "1.0"
+
+# 日期时间
+chrono = "0.4"
+
+# 并发
+rayon = "1.5"
+crossbeam = "0.8"
+```
+
+### 常用工具
+```bash
+# 性能分析
+cargo install cargo-flamegraph
+cargo flamegraph
+
+# 二进制大小
+cargo install cargo-bloat
+cargo bloat --release
+
+# 代码覆盖率
+cargo install cargo-tarpaulin
+cargo tarpaulin
+
+# 安全检查
+cargo install cargo-audit
+cargo audit
+
+# 依赖检查
+cargo install cargo-deny
+cargo deny check
+```
+
+---
+
+**资源持续更新中...** 🔄
+
+**最后更新时间**: 2026-01-26
