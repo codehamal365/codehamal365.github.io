@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 
-gem "jekyll-theme-chirpy"
+gem "minimal-mistakes-jekyll"
 gem "jekyll-archives"
 gem "jekyll-paginate"
 gem "jekyll-sitemap"
